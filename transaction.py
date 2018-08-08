@@ -1,22 +1,38 @@
 # -*- coding: utf-8 -*-
 
+class Account:
+
+    def __init__(self, category, description, amount):
+        self.category = category
+        self.description = description
+        self.amount = amount
+
+    def __str__(selft):
+        return '<Account %s, %2.f, %s>' % (
+                self.category,
+                self.amount,
+                self.description
+            )
+
 class Transaction:
 
-    def __init__(self, date, amount, description, target_account):
+    def __init__(self, date, amount, description, accounts):
+        assert type(accounts) is list, '"accounts must be list"'
+        assert len(accounts) > 0, '"accounts" mustn\'t be empty'
         self.date = date
         self.amount = amount
         self.description = description
-        self.target_account = target_account
+        self.accounts = accounts
 
     def __str__(self):
         return '<Transaction %s, %s, %s, %s>'% (
             self.date,
             self.amount,
             self.description,
-            self.target_account
+            self.accounts
         )
 
-    def to_qif_line(self):
+    def dump(self):
         result = []
 
         # Header
@@ -31,11 +47,12 @@ class Transaction:
         # Payee
         result.append('P' + self.description)
 
-        if type(self.target_account) is str:
+        if len(self.accounts) == 1:
             # Category
-            result.append('L' + self.target_account)
-        elif type(self.target_account) is list:
-            for account in self.target_account:
+            result.append('L' + self.accounts[0].category)
+        else:
+            # split transaction
+            for account in self.accounts:
                 # Category in split
                 result.append('S' + account.category)
 
@@ -44,8 +61,6 @@ class Transaction:
 
                 # Dollar amount of split
                 result.append('$' + '%.2f' % account.amount)
-        else:
-            assert False, '"target_account" mustn\'t be empty'
 
         # End of the entry
         result.append('^')
