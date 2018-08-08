@@ -16,9 +16,10 @@ class Account:
 
 class Transaction:
 
-    def __init__(self, date, amount, description, accounts):
+    def __init__(self, source, date, amount, description, accounts):
         assert type(accounts) is list, '"accounts must be list"'
         assert len(accounts) > 0, '"accounts" mustn\'t be empty'
+        self.source = source
         self.date = date
         self.amount = amount
         self.description = description
@@ -34,6 +35,16 @@ class Transaction:
 
     def dump(self):
         result = []
+
+
+        # Header of account
+        result.append('!Account')
+
+        # Source account
+        result.append('N' + self.source)
+
+        # End of the entry
+        result.append('^')
 
         # Header
         result.append('!Type:Cash')
