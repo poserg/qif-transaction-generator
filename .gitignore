@@ -105,3 +105,5 @@ venv.bak/
 
 # sublime's project
 *.sublime*
+
+*.sqlite

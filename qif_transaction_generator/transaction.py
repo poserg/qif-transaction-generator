@@ -7,7 +7,7 @@ class Account:
         self.description = description
         self.amount = amount
 
-    def __str__(selft):
+    def __str__(self):
         return '<Account %s, %2.f, %s>' % (
                 self.category,
                 self.amount,
@@ -35,7 +35,6 @@ class Transaction:
 
     def dump(self):
         result = []
-
 
         # Header of account
         result.append('!Account')
