@@ -6,15 +6,15 @@ import logging
 
 from qif_transaction_generator.app import add_receipt
 
+
+def add(args):
+    add_receipt(args.fn, args.fp, args.fd, args.purchase_date, args.total)
+
 parser = argparse.ArgumentParser(
     description="Transaction Generator",
 )
+
 logging_group = parser.add_mutually_exclusive_group()
-parser.add_argument('fn')
-parser.add_argument('fp')
-parser.add_argument('fd')
-parser.add_argument('purchase_date', help='purchase date')
-parser.add_argument('total')
 logging_group.add_argument('-v',
                            '--verbose',
                            help='Verbose (debug) logging',
@@ -28,8 +28,20 @@ logging_group.add_argument('-q',
                            const=logging.WARN,
                            dest='log_level')
 
+subparsers = parser.add_subparsers()
+
+# create the parser for the "add" command
+parser_add = subparsers.add_parser('add', aliases=['a'],
+                                   description='Add new receipt')
+parser_add.set_defaults(func=add)
+parser_add.add_argument('fn')
+parser_add.add_argument('fp')
+parser_add.add_argument('fd')
+parser_add.add_argument('purchase_date', help='purchase date')
+parser_add.add_argument('total', type=int)
 
 args = parser.parse_args()
 logging.basicConfig(level=args.log_level or logging.INFO)
 logging.debug(args)
-add_receipt(args.fn, args.fp, args.fd, args.purchase_date, args.total)
+
+args.func(args)
