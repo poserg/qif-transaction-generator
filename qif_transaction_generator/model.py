@@ -3,6 +3,8 @@ from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, \
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
+import enum
+
 Base = declarative_base()
 
 
@@ -14,6 +16,13 @@ class Status(Base):
 
     def __repr__(self):
         return "<Status(code = '%s')>" % (self.code)
+
+
+class StatusEnum(enum.Enum):
+    CREATED = 1
+    FOUND = 2
+    NOT_FOUND = 3
+    LOADED = 4
 
 
 class Receipt(Base):
