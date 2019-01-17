@@ -15,8 +15,8 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from qif_transaction_generator import model
-target_metadata = model.Base.metadata
+from qif_transaction_generator import models
+target_metadata = models.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
