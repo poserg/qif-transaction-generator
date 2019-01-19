@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse
 import logging
+import argparse
+import configparser
 
-from qif_transaction_generator.app import add_receipt
+from qif_transaction_generator.app import App
+from qif_transaction_generator.config import Config
 
 logger = logging.getLogger('trangen')
+config_file = 'config.ini'
+config = Config()
+app = App()
 
 
-def add(args):
-    return add_receipt(args.fn,
-                       args.fp,
-                       args.fd,
-                       args.purchase_date,
-                       args.total)
+def add():
+    return app.add_receipt(config.args.fn,
+                           config.args.fp,
+                           config.args.fd,
+                           config.args.purchase_date,
+                           config.args.total)
 
 
 def parse_arguments():
@@ -37,10 +42,10 @@ def parse_arguments():
                                dest='log_level')
 
     parser.add_argument('-c',
-                        '--config',
-                        help='Config file',
-                        default='config.ini',
-                        dest='config')
+                        help='Config file (default \'%s\')' % config_file,
+                        default=config_file,
+                        dest='config',
+                        )
 
     subparsers = parser.add_subparsers()
 
@@ -58,12 +63,23 @@ def parse_arguments():
     return args
 
 
+def init_config(args):
+    config.args = args
+    cfg = configparser.ConfigParser()
+    cfg.read(args.config)
+    config.login = cfg['fns']['login']
+    config.password = cfg['fns']['password']
+    config.dbpath = cfg['db']['dbpath']
+
+
 def main():
     args = parse_arguments()
     logging.basicConfig(level=args.log_level or logging.INFO)
     logger.debug(args)
 
-    args.func(args)
+    init_config(args)
+    app.init()
+    args.func()
 
 if __name__ == '__main__':
     main()
