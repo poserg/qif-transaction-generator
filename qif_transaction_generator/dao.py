@@ -28,3 +28,12 @@ class DBUtil:
         session.commit()
 
         return r.id
+
+    def begin_session(self):
+        return self.Session()
+
+    def get_receipt_by_status(self, session, status_ids):
+        query = session.query(Receipt).filter(
+            Receipt.status_id.in_(status_ids))
+        result = query.all()
+        return result

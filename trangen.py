@@ -22,6 +22,10 @@ def add():
                            config.args.total)
 
 
+def revise():
+    return app.revise_receipt()
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Transaction Generator",
@@ -59,6 +63,11 @@ def parse_arguments():
     parser_add.add_argument('purchase_date', help='purchase date')
     parser_add.add_argument('total', type=int)
 
+    # create the parser for the "revise" command
+    parser_revise = subparsers.add_parser('revise', aliases=['r'],
+                                          description='Revise receipts')
+    parser_revise.set_defaults(func=revise)
+
     args = parser.parse_args()
     return args
 
@@ -75,6 +84,8 @@ def init_config(args):
 def main():
     args = parse_arguments()
     logging.basicConfig(level=args.log_level or logging.INFO)
+    # %(asctime)s - %(name)s - %(levelname)s - %(message)s
+    # %(name)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s
     logger.debug(args)
 
     init_config(args)

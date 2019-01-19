@@ -40,11 +40,17 @@ class Receipt(Base):
 
     items = relationship('Item')
     status_id = Column(Integer, ForeignKey('statuses.id'), nullable=False)
-    staus = relationship('Status')
+    status = relationship('Status')
 
     def __repr__(self):
-        return "<Receipt(total_sum = '%d', date_time = '%s', status = '%s')>" % (
-            self.total_sum, self.date_time, self.status)
+        return "<Receipt(id = %d fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
+                self.id,
+                self.fn,
+                self.fp,
+                self.fd,
+                self.purchase_date,
+                self.total,
+                self.status.code)
 
 
 class Item(Base):
