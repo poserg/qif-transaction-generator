@@ -7,10 +7,12 @@ from sqlalchemy.orm import sessionmaker
 
 from qif_transaction_generator.models import Receipt, StatusEnum
 
+logger = logging.getLogger(__name__)
+
 
 class DBUtil:
     def __init__(self, path):
-        logging.debug('DB path = "%s"', path)
+        logger.debug('DB path = "%s"', path)
         self._engine = create_engine(path)
         self.Session = sessionmaker(bind=self._engine)
 
