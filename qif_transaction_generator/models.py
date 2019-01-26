@@ -8,14 +8,20 @@ import enum
 Base = declarative_base()
 
 
-class Status(Base):
-    __tablename__ = 'statuses'
+class Reference:
 
     id = Column(Integer, primary_key=True)
     code = Column(String, nullable=False)
 
     def __repr__(self):
-        return "<Status(code = '%s')>" % (self.code)
+        return "<%s(id = '%d', code = '%s')>" % (
+            self.__name__,
+            self.id,
+            self.code)
+
+
+class Status(Base, Reference):
+    __tablename__ = 'statuses'
 
 
 class StatusEnum(enum.Enum):
@@ -95,3 +101,39 @@ class Dictionary(Base):
     def __repr__(self):
         return "<Dictionary(category = '%s', phrase = '%s', item = '%s', weight = '%s')>" % (
             self.category.code, self.phrase, self.item.name, self.weight)
+
+
+class AccountType(Base, Reference):
+    __tablename__ = 'account_types'
+
+
+class AccountTypeEnum(enum.Enum):
+    ASSET = 1
+    BANK = 2
+    CASH = 3
+    CREDIT = 4
+    EQUITY = 5
+    EXPENSE = 6
+    INCOME = 7
+    LIABILITY = 8
+    MUTUAL = 9
+    ROOT = 10
+    STOCK = 11
+    TRADING = 12
+
+
+class Account(Base):
+    __tablename__ = 'accounts'
+
+    guid = Column(String(32), primary_key=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    parent_guid = Column(String(32), ForeignKey("accounts.guid"))
+    account_type_id = Column(
+        Integer, ForeignKey("account_types.id"), nullable=False)
+    type = relationship('AccountType')
+
+    def __repr__(self):
+        return "<%s(guid = %s, name = %s, type = %s, parent_guid = %s" % (
+            self.__name__, self.guid, self.name, self.type.code,
+            self.parent_guid)
