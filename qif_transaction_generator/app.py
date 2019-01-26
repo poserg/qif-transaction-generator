@@ -8,11 +8,12 @@ from qif_transaction_generator.dao import DBUtil
 from qif_transaction_generator.config import Config
 from qif_transaction_generator.models import StatusEnum
 
+from qif_transaction_generator.gnucash import parse_accounts
+
 logger = logging.getLogger(__name__)
 
 
 class App:
-
     def __init__(self):
         self.config = Config()
 
@@ -41,8 +42,7 @@ class App:
                 if check_receipt(r):
                     r.status_id = StatusEnum.FOUND.value
                     logger.debug('receipt exists')
-                    info = revise_info(r,
-                                       self.config.login,
+                    info = revise_info(r, self.config.login,
                                        self.config.password)
                     try:
                         logger.debug('info: %s' % info.json())
@@ -62,3 +62,8 @@ class App:
             raise
         finally:
             session.close()
+
+    def sync_accounts(self):
+        assert self.config.gnucash_account_path
+        accounts = parse_accounts(self.config.gnucash_account_path)
+        self.db_util.create_accounts(accounts)

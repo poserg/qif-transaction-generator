@@ -15,7 +15,7 @@ class Reference:
 
     def __repr__(self):
         return "<%s(id = '%d', code = '%s')>" % (
-            self.__name__,
+            self.__tablename__,
             self.id,
             self.code)
 
@@ -134,6 +134,6 @@ class Account(Base):
     type = relationship('AccountType')
 
     def __repr__(self):
-        return "<%s(guid = %s, name = %s, type = %s, parent_guid = %s" % (
-            self.__name__, self.guid, self.name, self.type.code,
-            self.parent_guid)
+        return "<%s(guid = %s, name = %s, type = %s, parent_guid = %s>" % (
+            self.__tablename__, self.guid, self.name, self.account_type_id
+            if self.type is None else self.type.name, self.parent_guid)

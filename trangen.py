@@ -26,6 +26,10 @@ def revise():
     return app.revise_receipt()
 
 
+def sync_accounts():
+    return app.sync_accounts()
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Transaction Generator",
@@ -68,6 +72,14 @@ def parse_arguments():
                                           description='Revise receipts')
     parser_revise.set_defaults(func=revise)
 
+    # create the parser for the "sync" command
+    parser_sync = subparsers.add_parser(
+        'sync', aliases=['s'],
+        description='Import or sync accounts from GnuCash')
+    parser_sync.set_defaults(func=sync_accounts)
+    parser_sync.add_argument('account_file',
+                             help='path to account file',)
+
     args = parser.parse_args()
     return args
 
@@ -79,6 +91,7 @@ def init_config(args):
     config.login = cfg['fns']['login']
     config.password = cfg['fns']['password']
     config.dbpath = cfg['db']['dbpath']
+    config.gnucash_account_path = args.account_file
 
 
 def main():
