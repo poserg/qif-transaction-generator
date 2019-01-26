@@ -30,6 +30,10 @@ def sync_accounts():
     return app.sync_accounts()
 
 
+def enrich():
+    return app.enrich_receipts()
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Transaction Generator",
@@ -80,6 +84,11 @@ def parse_arguments():
     parser_sync.add_argument('account_file',
                              help='path to account file',)
 
+    # create the parser for the "enrich" command
+    parser_enrich = subparsers.add_parser(
+        'enrich', aliases=['e'], description='Enrich receipts')
+    parser_enrich.set_defaults(func=enrich)
+
     args = parser.parse_args()
     return args
 
@@ -91,7 +100,7 @@ def init_config(args):
     config.login = cfg['fns']['login']
     config.password = cfg['fns']['password']
     config.dbpath = cfg['db']['dbpath']
-    config.gnucash_account_path = args.account_file
+    config.args = args
 
 
 def main():

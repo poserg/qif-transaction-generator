@@ -38,6 +38,12 @@ class DBUtil:
         result = query.all()
         return result
 
+    def get_receipt_without_items_by_status(self, session, status_ids):
+        query = session.query(Receipt).filter(~Receipt.items.any()).filter(
+            Receipt.status_id.in_(status_ids))
+        result = query.all()
+        return result
+
     def create_accounts(self, accounts_list):
         session = self.Session()
         session.add_all(accounts_list)
