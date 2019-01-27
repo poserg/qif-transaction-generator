@@ -69,38 +69,28 @@ class Item(Base):
     quantity = Column(Integer, nullable=False)
     sum = Column(Integer, nullable=False)
 
-    category_id = Column(Integer, ForeignKey('categories.id'))
+    account_guid = Column(String(32), ForeignKey('accounts.guid'))
 
     def __repr__(self):
-        return "<Item(name = '%s', price = '%d', quantity = '%d', sum = '%d')>" % (
-            self.name, self.price, self.quantity, self.sum)
-
-
-class Category(Base):
-    __tablename__ = 'categories'
-
-    id = Column(Integer, primary_key=True)
-    code = Column(String, nullable=False)
-
-    def __repr__(self):
-        return "<Category(code = '%s')>" % (self.code)
+        return "<Item(name = '%s', price = '%d', quantity = '%d', sum = '%d', account_guid = '%s')>" % (
+            self.name, self.price, self.quantity, self.sum, self.account_guid)
 
 
 class Dictionary(Base):
     __tablename__ = 'dictionaries'
 
     id = Column(BigInteger, primary_key=True)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    account_guid = Column(String(32), ForeignKey('accounts.guid'), nullable=False)
     item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
     phrase = Column(String, nullable=False)
     weight = Column(Integer, nullable=False)
 
-    category = relationship('Category')
+    account = relationship('Account')
     item = relationship('Item')
 
     def __repr__(self):
-        return "<Dictionary(category = '%s', phrase = '%s', item = '%s', weight = '%s')>" % (
-            self.category.code, self.phrase, self.item.name, self.weight)
+        return "<Dictionary(account_guid = '%s', phrase = '%s', item = '%s', weight = '%s')>" % (
+            self.account_guid, self.phrase, self.item.name, self.weight)
 
 
 class AccountType(Base, Reference):

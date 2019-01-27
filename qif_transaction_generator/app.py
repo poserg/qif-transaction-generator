@@ -67,7 +67,7 @@ class App:
 
     def sync_accounts(self):
         assert self.config.args.account_file
-        accounts = parse_accounts(self.config.gnucash_account_path)
+        accounts = parse_accounts(self.config.args.account_file)
         self.db_util.create_accounts(accounts)
 
     def enrich_receipts(self):
