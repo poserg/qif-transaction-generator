@@ -12,8 +12,11 @@ def from_string_to_json(raw):
 
 
 def parse_receipt(receipt, json):
-    assert receipt.items is None or len(receipt.items) == 0, 'items must be empty'
-    if 'document' not in json.keys() or 'receipt' not in json['document'].keys():
+    assert receipt.items is None or len(
+        receipt.items) == 0, 'items must be empty'
+
+    if 'document' not in json.keys() or 'receipt' not in json['document'].keys(
+    ):
         logger.error('json doesn\'t contain document.receipt')
     else:
         r = json['document']['receipt']

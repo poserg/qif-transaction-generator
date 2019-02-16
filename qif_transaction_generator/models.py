@@ -49,14 +49,14 @@ class Receipt(Base):
     status = relationship('Status')
 
     def __repr__(self):
-        return "<Receipt(id = %d fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
+        return "<Receipt(id = %s fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
                 self.id,
                 self.fn,
                 self.fp,
                 self.fd,
                 self.purchase_date,
                 self.total,
-                self.status.code)
+                self.status_id if self.status is None else self.status.code)
 
 
 class Item(Base):

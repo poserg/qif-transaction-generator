@@ -6,7 +6,7 @@ import logging
 from fns import check_receipt, revise_info
 from qif_transaction_generator.dao import DBUtil
 from qif_transaction_generator.config import Config
-from qif_transaction_generator.models import StatusEnum
+from qif_transaction_generator.models import Receipt, StatusEnum
 
 from qif_transaction_generator.gnucash import parse_accounts
 from qif_transaction_generator.json_utils import from_string_to_json, \
@@ -26,7 +26,13 @@ class App:
     def add_receipt(self, fn, fp, fd, purchase_date, total):
         assert self.db_util, 'App must be init'
         date = dateutil.parser.parse(purchase_date)
-        return self.db_util.create_receipt(fn, fp, fd, date, total)
+        r = Receipt(fn=fn,
+                    fp=fp,
+                    fd=fd,
+                    purchase_date=date,
+                    total=total,
+                    status_id=StatusEnum.CREATED.value)
+        return self.db_util.create_receipt(r)
 
     def revise_receipt(self):
         assert self.config.login, 'login mustn\'t be empty'
