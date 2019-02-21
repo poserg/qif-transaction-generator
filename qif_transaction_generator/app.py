@@ -39,31 +39,7 @@ class App:
         assert self.config.password, 'password mustn\'t be empty'
         session = self.db_util.begin_session()
         try:
-            receipts = self.db_util.get_receipt_by_status(
-                session,
-                [StatusEnum.CREATED.value, StatusEnum.NOT_FOUND.value])
-            logger.info('found %d receipt(s) for revising' % len(receipts))
-            logger.debug(receipts)
-
-            for r in receipts:
-                logger.info('revising %s' % r)
-                if check_receipt(r):
-                    r.status_id = StatusEnum.FOUND.value
-                    logger.debug('receipt exists')
-                    info = revise_info(r, self.config.login,
-                                       self.config.password)
-                    try:
-                        logger.debug('info: %s' % info.json())
-                        r.raw = str(info.json())
-                        r.status_id = StatusEnum.LOADED.value
-                    except:
-                        logger.warn('info isn\'t a json')
-                        r.status_id = StatusEnum.NOT_FOUND.value
-                else:
-                    logger.warn('receipt doesn\'t exist')
-                    r.status_id = StatusEnum.NOT_FOUND.value
-            if len(receipts) == 0:
-                logger.info('there\'re not receipts for revising')
+            self._process_revise_receipt(session)
             session.commit()
         except:
             session.rollback()
@@ -88,7 +64,7 @@ class App:
                 if receipt.raw is None:
                     logger.error('raw is empty for receipt(%d)', receipt.id)
                 else:
-                    _parse_receipt_json(receipt)
+                    self._parse_receipt_json(receipt)
             # session.commit()
         except:
             session.rollback()
@@ -96,10 +72,36 @@ class App:
         finally:
             session.close()
 
+    def _parse_receipt_json(self, receipt):
+        json = from_string_to_json(receipt.raw)
+        parse_receipt(receipt, json)
 
-def _parse_receipt_json(receipt):
-    json = from_string_to_json(receipt.raw)
-    parse_receipt(receipt, json)
+        import pdb
+        pdb.set_trace()
 
-    import pdb
-    pdb.set_trace()
+    def _process_revise_receipt(self, session):
+        receipts = self.db_util.get_receipt_by_status(
+            session,
+            [StatusEnum.CREATED.value, StatusEnum.NOT_FOUND.value])
+        logger.info('found %d receipt(s) for revising' % len(receipts))
+        logger.debug(receipts)
+
+        for r in receipts:
+            logger.info('revising %s' % r)
+            if check_receipt(r):
+                r.status_id = StatusEnum.FOUND.value
+                logger.debug('receipt exists')
+                info = revise_info(r, self.config.login,
+                                   self.config.password)
+                try:
+                    logger.debug('info: %s' % info.json())
+                    r.raw = str(info.json())
+                    r.status_id = StatusEnum.LOADED.value
+                except:
+                    logger.warning('info isn\'t a json')
+                    r.status_id = StatusEnum.NOT_FOUND.value
+            else:
+                logger.warning('receipt doesn\'t exist')
+                r.status_id = StatusEnum.NOT_FOUND.value
+        if len(receipts) == 0:
+            logger.info('there\'re not receipts for revising')
