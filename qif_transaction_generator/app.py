@@ -9,8 +9,7 @@ from qif_transaction_generator.config import Config
 from qif_transaction_generator.models import Receipt, StatusEnum
 
 from qif_transaction_generator.gnucash import parse_accounts
-from qif_transaction_generator.json_utils import from_string_to_json, \
-    parse_receipt
+from qif_transaction_generator.enriching import enrich_receipt_items_from_json
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +63,7 @@ class App:
                 if receipt.raw is None:
                     logger.error('raw is empty for receipt(%d)', receipt.id)
                 else:
-                    self._parse_receipt_json(receipt)
+                    enrich_receipt_items_from_json(receipt)
             # session.commit()
             session.rollback()
         except:
@@ -72,20 +71,6 @@ class App:
             raise
         finally:
             session.close()
-
-    def _parse_receipt_json(self, receipt):
-        assert receipt.items is None or len(
-            receipt.items) == 0, 'items must be empty'
-
-        json = from_string_to_json(receipt.raw)
-        try:
-            parse = parse_receipt(receipt, json)
-            receipt.ecash_total_sum = parse.ecash_total_sum
-            receipt.cash_total_sum = parse.cash_total_sum
-            receipt.items = parse.items
-        except KeyError as e:
-            logger.error('Json couldn\'t parse. It\'s a wrong format: %s, %s',
-                         e.value, json)
 
     def _process_revise_receipt(self, session):
         receipts = self.db_util.get_receipt_by_status(
