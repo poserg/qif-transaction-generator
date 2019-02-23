@@ -66,6 +66,7 @@ class App:
                 else:
                     self._parse_receipt_json(receipt)
             # session.commit()
+            session.rollback()
         except:
             session.rollback()
             raise
@@ -73,11 +74,18 @@ class App:
             session.close()
 
     def _parse_receipt_json(self, receipt):
-        json = from_string_to_json(receipt.raw)
-        parse_receipt(receipt, json)
+        assert receipt.items is None or len(
+            receipt.items) == 0, 'items must be empty'
 
-        import pdb
-        pdb.set_trace()
+        json = from_string_to_json(receipt.raw)
+        try:
+            parse = parse_receipt(receipt, json)
+            receipt.ecash_total_sum = parse.ecash_total_sum
+            receipt.cash_total_sum = parse.cash_total_sum
+            receipt.items = parse.items
+        except KeyError as e:
+            logger.error('Json couldn\'t parse. It\'s a wrong format: %s, %s',
+                         e.value, json)
 
     def _process_revise_receipt(self, session):
         receipts = self.db_util.get_receipt_by_status(
