@@ -1,6 +1,7 @@
 language: python
 install:
+  - pip install flake8 --use-mirrors
   - cat requirements.txt | xargs -n 1 pip install
 script:
-  - flake8
+  # - flake8
   - python -m unittest discover
