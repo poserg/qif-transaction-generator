@@ -1,6 +1,6 @@
 language: python
 install:
   - cat requirements.txt | xargs -n 1 pip install
-srcipt:
+script:
   - flake8
   - python -m unittest discover
