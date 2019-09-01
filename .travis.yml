@@ -1,6 +1,6 @@
 language: python
 install:
-  - pip install flake8 --use-mirrors
+  - pip install flake8
   - cat requirements.txt | xargs -n 1 pip install
 script:
   # - flake8
