@@ -96,7 +96,7 @@ def parse_arguments():
 def init_config(args):
     config.args = args
     cfg = configparser.ConfigParser()
-    cfg.read(args.config)
+    cfg.read_file(open(args.config))
     config.login = cfg['fns']['login']
     config.password = cfg['fns']['password']
     config.dbpath = cfg['db']['dbpath']
