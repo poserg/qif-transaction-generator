@@ -18,7 +18,7 @@ def enrich_receipt_items_from_json(receipt):
             receipt.cash_total_sum = parse.cash_total_sum
             receipt.items = parse.items
         except Exception as e:
-            logger.error('Couldn\'t parse json. It\'s a wrong format: %s, %s',
-                         e.value, json)
+            logger.exception('Couldn\'t parse json. It\'s a wrong format: %s, %s',
+                         e, json)
     except Exception as e:
-        logger.error('Couldn\'t convert raw to json. %s', receipt.raw)
+        logger.exception('Couldn\'t convert raw to json. %s', receipt.raw)

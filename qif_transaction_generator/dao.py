@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class DBUtil:
     def __init__(self, path):
         logger.debug('DB path = "%s"', path)
-        self._engine = create_engine(path, echo=True)
+        self._engine = create_engine(path)
         self.Session = sessionmaker(bind=self._engine)
 
     def create_receipt(self, receipt):

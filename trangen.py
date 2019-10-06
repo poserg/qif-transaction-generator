@@ -106,6 +106,8 @@ def init_config(args):
 def main():
     args = parse_arguments()
     logging.basicConfig(level=args.log_level or logging.INFO)
+    if logging.DEBUG == args.log_level:
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     # %(asctime)s - %(name)s - %(levelname)s - %(message)s
     # %(name)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s
     logger.debug(args)
