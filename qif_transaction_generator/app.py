@@ -9,7 +9,7 @@ from qif_transaction_generator.config import Config
 from qif_transaction_generator.models import Receipt, StatusEnum
 
 from qif_transaction_generator.gnucash import parse_accounts
-from qif_transaction_generator.enriching import enrich_receipt_items_from_json
+from qif_transaction_generator.enriching import enrich_receipt_items_from_json, bind_items_to_categories
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,7 @@ class App:
                     logger.error('raw is empty for receipt(%d)', receipt.id)
                 else:
                     enrich_receipt_items_from_json(receipt)
+                    undefined_items = bind_items_to_categories(self.db_util, receipt)
             # session.commit()
             session.rollback()
         except:
@@ -74,8 +75,7 @@ class App:
 
     def _process_revise_receipt(self, session):
         receipts = self.db_util.get_receipt_by_status(
-            session,
-            [StatusEnum.CREATED.value, StatusEnum.NOT_FOUND.value])
+            session, [StatusEnum.CREATED.value, StatusEnum.NOT_FOUND.value])
         logger.info('found %d receipt(s) for revising' % len(receipts))
         logger.debug(receipts)
 
@@ -84,8 +84,7 @@ class App:
             if check_receipt(r):
                 r.status_id = StatusEnum.FOUND.value
                 logger.debug('receipt exists')
-                info = revise_info(r, self.config.login,
-                                   self.config.password)
+                info = revise_info(r, self.config.login, self.config.password)
                 try:
                     logger.debug('info: %s' % info.json())
                     r.raw = str(info.json())

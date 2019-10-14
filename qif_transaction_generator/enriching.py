@@ -22,3 +22,26 @@ def enrich_receipt_items_from_json(receipt):
                          e, json)
     except Exception as e:
         logger.exception('Couldn\'t convert raw to json. %s', receipt.raw)
+
+
+def bind_items_to_categories(db_util, receipt):
+    logger.debug('start bind_items_to_categories')
+    for item in receipt.items:
+        logger.debug('item\'s name is \'%s\'', item.name)
+        phrases = _get_phrases(item.name)
+        logger.debug('phrases: %s', phrases)
+        d = db_util.get_dictionaries_by_phrases(phrases)
+        logger.debug('dictionaries: %s', d)
+
+    logger.debug('finish bind_items_to_categories')
+
+
+def _get_phrases(value):
+    result = []
+    result.append(value)
+
+    split = value.split(' ')
+    if len(split) > 3:
+        result.append(' '.join(split[:3]))
+    result.extend(split)
+    return result
