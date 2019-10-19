@@ -16,12 +16,15 @@ class DBUtil:
         self._engine = create_engine(path)
         self.Session = sessionmaker(bind=self._engine)
 
-    def create_receipt(self, receipt):
+    def create(self, obj):
         session = self.Session()
-        session.add(receipt)
+        session.add(obj)
         session.commit()
 
-        return receipt.id
+        return obj.id
+
+    def create_receipt(self, receipt):
+        return self.create(receipt)
 
     def get_current_session(self):
         return self.current_session or self.begin_session()

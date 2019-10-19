@@ -37,10 +37,11 @@ def bind_items_to_categories(db_util, receipt):
 
 
 def _get_phrases(value):
+    v = value.lower()
     result = []
-    result.append(value)
+    result.append(v)
 
-    split = value.split(' ')
+    split = v.split(' ')
     if len(split) > 3:
         result.append(' '.join(split[:3]))
     result.extend(split)

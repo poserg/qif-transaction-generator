@@ -34,6 +34,10 @@ def enrich():
     return app.enrich_receipts()
 
 
+def add_phrase():
+    return app.add_phrase()
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Transaction Generator",
@@ -89,6 +93,13 @@ def parse_arguments():
         'enrich', aliases=['e'], description='Enrich receipts')
     parser_enrich.set_defaults(func=enrich)
 
+    # create the parser for the "add-phrase" command
+    parser_bind = subparsers.add_parser(
+        'add-phrase', aliases=['b'], description='add phrase to dictionary')
+    parser_bind.set_defaults(func=add_phrase)
+    parser_bind.add_argument('guid', help='account guid')
+    parser_bind.add_argument('phrase')
+
     args = parser.parse_args()
     return args
 
@@ -115,6 +126,7 @@ def main():
     init_config(args)
     app.init()
     args.func()
+
 
 if __name__ == '__main__':
     main()

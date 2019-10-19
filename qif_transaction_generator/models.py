@@ -1,5 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, \
- Text, BigInteger
+    Text, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -81,16 +81,14 @@ class Dictionary(Base):
 
     id = Column(BigInteger, primary_key=True)
     account_guid = Column(String(32), ForeignKey('accounts.guid'), nullable=False)
-    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
     phrase = Column(String, nullable=False)
     weight = Column(Integer, nullable=False)
 
     account = relationship('Account')
-    item = relationship('Item')
 
     def __repr__(self):
-        return "<Dictionary(account_guid = '%s', phrase = '%s', item = '%s', weight = '%s')>" % (
-            self.account_guid, self.phrase, self.item.name, self.weight)
+        return "<Dictionary(account_guid = '%s', phrase = '%s', weight = '%s')>" % (
+            self.account_guid, self.phrase, self.weight)
 
 
 class AccountType(Base, Reference):

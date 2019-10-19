@@ -6,7 +6,8 @@ import logging
 from fns import check_receipt, revise_info
 from qif_transaction_generator.dao import DBUtil
 from qif_transaction_generator.config import Config
-from qif_transaction_generator.models import Receipt, StatusEnum
+from qif_transaction_generator.models import Receipt, StatusEnum, \
+    Dictionary
 
 from qif_transaction_generator.gnucash import parse_accounts
 from qif_transaction_generator.enriching import enrich_receipt_items_from_json, bind_items_to_categories
@@ -97,3 +98,12 @@ class App:
                 r.status_id = StatusEnum.NOT_FOUND.value
         if len(receipts) == 0:
             logger.info('there\'re not receipts for revising')
+
+    def add_phrase(self):
+        assert self.config.args.phrase
+        assert self.config.args.guid
+
+        d = Dictionary(account_guid=self.config.args.guid,
+                       phrase=self.config.args.phrase,
+                       weight=0)
+        return self.db_util.create(d)

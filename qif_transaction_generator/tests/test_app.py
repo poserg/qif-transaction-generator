@@ -54,3 +54,26 @@ class TestAppAddReceipt(unittest.TestCase):
     def test_add_receipt_date_parse_raise(self):
         self.assertRaises(ValueError, self.app.add_receipt, 'fn', 'fp', 'fd',
                           'today', '123')
+
+
+class TestAppAddPhrase(unittest.TestCase):
+
+    @mock.patch.object(DBUtil, '__init__', lambda x, y: None)
+    def setUp(self):
+        config = Config()
+        config.dbpath = 'dbpath'
+        config.args = type("TestArgs", (object,), {})()
+        config.args.guid = 'test_guid'
+        config.args.phrase = 'test_phrase'
+
+        self.app = App()
+        self.app.init()
+
+    @mock.patch('qif_transaction_generator.dao.DBUtil.create')
+    def test_add_phrase_good_case(self, mock_db_util_create):
+        self.app.add_phrase()
+        self.assertEqual(mock_db_util_create.call_count, 1)
+        name, args, kwargs = mock_db_util_create.mock_calls[0]
+        self.assertEqual(args[0].account_guid, 'test_guid')
+        self.assertEqual(args[0].phrase, 'test_phrase')
+        self.assertEqual(args[0].weight, 0)
