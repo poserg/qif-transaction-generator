@@ -122,6 +122,8 @@ class Account(Base):
     type = relationship('AccountType')
 
     def __repr__(self):
-        return "<%s(guid = %s, name = %s, type = %s, parent_guid = %s>" % (
-            self.__tablename__, self.guid, self.name, self.account_type_id
-            if self.type is None else self.type.name, self.parent_guid)
+        return "<%s(guid = %s, name = %s, type = , parent_guid = %s>" % (
+            self.__tablename__, self.guid, self.name,
+            #self.account_type_id
+            #if self.type is None else self.type.value,
+            self.parent_guid)

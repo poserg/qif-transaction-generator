@@ -38,6 +38,10 @@ def add_phrase():
     return app.add_phrase()
 
 
+def search_accounts():
+    return app.search_accounts()
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Transaction Generator",
@@ -99,6 +103,12 @@ def parse_arguments():
     parser_bind.set_defaults(func=add_phrase)
     parser_bind.add_argument('guid', help='account guid')
     parser_bind.add_argument('phrase')
+
+    # create the parser for the "search-account" command
+    parser_bind = subparsers.add_parser(
+        'search-accounts', aliases=['sa'], description='search accounts')
+    parser_bind.set_defaults(func=search_accounts)
+    parser_bind.add_argument('search_text', help='search text')
 
     args = parser.parse_args()
     return args

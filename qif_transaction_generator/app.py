@@ -107,3 +107,15 @@ class App:
                        phrase=self.config.args.phrase,
                        weight=0)
         return self.db_util.create(d)
+
+    def search_accounts(self):
+        logger.debug('start search_accounts')
+        assert self.config.args.search_text
+
+        r = self.db_util.search_accounts(self.config.args.search_text)
+        if len(r) == 0:
+            logger.info('search result is empty')
+        else:
+            logger.info('search result:')
+            for i in r:
+                logger.info('guid = %s ; name = %s; parent = %s ', i.guid, i.name, i.parent_guid)

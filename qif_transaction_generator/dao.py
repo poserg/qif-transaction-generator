@@ -2,10 +2,11 @@
 
 import logging
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 
-from qif_transaction_generator.models import Receipt, Dictionary
+from qif_transaction_generator.models import Receipt, Dictionary, Item, \
+    Account
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class DBUtil:
         logger.debug('DB path = "%s"', path)
         self._engine = create_engine(path)
         self.Session = sessionmaker(bind=self._engine)
+        self.current_session = None
 
     def create(self, obj):
         session = self.Session()
@@ -60,3 +62,9 @@ class DBUtil:
         return self.get_current_session().query(Dictionary).filter(
             Dictionary.phrase == item_name).order_by(
                 Dictionary.weight.desc()).limit(1).all()
+
+    def search_accounts(self, search_text):
+        st = '%' + search_text + '%'
+        return self.get_current_session().query(Account).filter(or_(
+            Account.name.ilike(st),
+            Account.description.ilike(st))).all()
