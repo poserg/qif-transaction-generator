@@ -50,7 +50,7 @@ class Receipt(Base):
 
     def __repr__(self):
         return "<Receipt(id = %s fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
-                self.id,
+            self.id,
                 self.fn,
                 self.fp,
                 self.fd,

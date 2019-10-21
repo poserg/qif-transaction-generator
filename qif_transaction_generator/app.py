@@ -10,7 +10,8 @@ from qif_transaction_generator.models import Receipt, StatusEnum, \
     Dictionary
 
 from qif_transaction_generator.gnucash import parse_accounts
-from qif_transaction_generator.enriching import enrich_receipt_items_from_json, bind_items_to_categories
+from qif_transaction_generator.enriching import bind_items_to_categories,\
+    enrich_receipt_items_from_json
 
 logger = logging.getLogger(__name__)
 
@@ -61,13 +62,16 @@ class App:
             logger.debug(receipts)
 
             for receipt in receipts:
+                logger.info('process receipt(%s)', receipt)
                 if receipt.raw is None:
                     logger.error('raw is empty for receipt(%d)', receipt.id)
                 else:
                     enrich_receipt_items_from_json(receipt)
-                    undefined_items = bind_items_to_categories(self.db_util, receipt)
-            # session.commit()
-            session.rollback()
+                    undefined_items = bind_items_to_categories(
+                        self.db_util, receipt)
+                    if len(undefined_items) == 0:
+                        logger.debug('all items were found for receipt(%d)', receipt.id)
+            session.commit()
         except:
             session.rollback()
             raise

@@ -42,7 +42,7 @@ class DBUtil:
         return result
 
     def get_receipt_without_items_by_status(self, session, status_ids):
-        query = session.query(Receipt).filter(~Receipt.items.any()).filter(
+        query = session.query(Receipt).filter(~Item.account_guid.isnot(None)).filter(
             Receipt.status_id.in_(status_ids))
         result = query.all()
         return result
