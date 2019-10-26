@@ -9,7 +9,8 @@ from qif_transaction_generator.config import Config
 from qif_transaction_generator.models import Receipt, StatusEnum, \
     Dictionary
 
-from qif_transaction_generator.gnucash import parse_accounts
+from qif_transaction_generator.gnucash import parse_accounts, \
+    set_up_account_names, get_difference_list
 from qif_transaction_generator.enriching import bind_items_to_categories,\
     enrich_receipt_items_from_json
 
@@ -51,7 +52,21 @@ class App:
     def sync_accounts(self):
         assert self.config.args.account_file
         accounts = parse_accounts(self.config.args.account_file)
-        self.db_util.create_accounts(accounts)
+        set_up_account_names(accounts)
+
+        db_accounts = self.db_util.get_all_accounts()
+
+        to_add, to_delete, to_modify = get_difference_list(accounts, db_accounts)
+        logger.info('to_add: %s', to_add)
+        logger.info('to_delete: %s', to_delete)
+        logger.info('to_modify: %s', to_modify)
+
+        if to_add:
+            self.db_util.create_accounts(to_add)
+        if to_delete:
+            self.db_util.delete_all(to_delete)
+        if to_add or to_delete or to_modify:
+            self.db_util.commit_current_sesssion()
 
     def enrich_receipts(self):
         session = self.db_util.begin_session()
@@ -122,4 +137,4 @@ class App:
         else:
             logger.info('search result:')
             for i in r:
-                logger.info('guid = %s ; name = %s; parent = %s ', i.guid, i.name, i.parent_guid)
+                logger.info(i.full_name)

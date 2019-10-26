@@ -36,3 +36,55 @@ def parse_accounts(file_path):
         accounts.append(a)
 
     return accounts
+
+
+def set_up_account_names(accounts):
+    '''
+    В имя счёта добавляется имя родиельского счёта
+    '''
+    d = {}
+    for a in accounts:
+        d[a.guid] = a
+    for a in accounts:
+        a.full_name = _get_full_account_name(d, a.guid)
+
+
+def _get_full_account_name(d, guid):
+    # import pdb; pdb.set_trace()
+    logger.debug('start _get_full_account_name(%s)', guid)
+    account = d[guid]
+    logger.debug('account\'s name is %s', account.name)
+    if account.parent_guid:
+        logger.debug('has parent with guid %s', account.name, account.parent_guid)
+        return _get_full_account_name(d, account.parent_guid) + ':' + account.name
+    else:
+        logger.debug('hasn\'t parent')
+        return account.name
+
+
+def get_difference_list(accounts, db_accounts):
+    to_delete = []
+    to_add = []
+    to_modify = []
+    for a in accounts:
+        is_exist = False
+        for db_a in db_accounts:
+            if a.guid == db_a.guid:
+                is_exist = True
+                if not a.equals(db_a):
+                    db_a.update_value(a)
+                    to_modify.append(db_a)
+                break
+        if not is_exist:
+            to_add.append(a)
+
+    for db_a in db_accounts:
+        is_exist = False
+        for a in accounts:
+            if db_a.guid == a.guid:
+                is_exist = True
+                break
+        if not is_exist:
+            to_delete.append(db_a)
+
+    return to_add, to_delete, to_modify

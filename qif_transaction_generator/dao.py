@@ -48,9 +48,8 @@ class DBUtil:
         return result
 
     def create_accounts(self, accounts_list):
-        session = self.Session()
+        session = self.get_current_session()
         session.add_all(accounts_list)
-        session.commit()
 
     def get_dictionaries_by_phrases(self, phrases_list):
         query = self.get_current_session().query(Dictionary).filter(
@@ -68,3 +67,14 @@ class DBUtil:
         return self.get_current_session().query(Account).filter(or_(
             Account.name.ilike(st),
             Account.description.ilike(st))).all()
+
+    def get_all_accounts(self):
+        return self.get_current_session().query(Account).all()
+
+    def delete_all(self, list):
+        session = self.get_current_session()
+        for l in list:
+            session.delete(l)
+
+    def commit_current_sesssion(self):
+        self.get_current_session().commit()

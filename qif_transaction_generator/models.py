@@ -115,6 +115,7 @@ class Account(Base):
 
     guid = Column(String(32), primary_key=True)
     name = Column(String, nullable=False)
+    full_name = Column(String)
     description = Column(String)
     parent_guid = Column(String(32), ForeignKey("accounts.guid"))
     account_type_id = Column(
@@ -122,8 +123,26 @@ class Account(Base):
     type = relationship('AccountType')
 
     def __repr__(self):
-        return "<%s(guid = %s, name = %s, type = , parent_guid = %s>" % (
+        return "<%s(guid = %s, name = %s, type = , parent_guid = %s, full_name = %s>" % (
             self.__tablename__, self.guid, self.name,
             #self.account_type_id
             #if self.type is None else self.type.value,
-            self.parent_guid)
+            self.parent_guid,
+            self.full_name)
+
+    def equals(self, other):
+        if isinstance(other, Account):
+            return self.guid == other.guid and \
+                self.name == other.name and \
+                self.description == other.description and \
+                self.parent_guid == other.parent_guid and \
+                self.account_type_id == other.account_type_id and \
+                self.full_name == other.full_name
+        return False
+
+    def update_value(self, o):
+        self.name = o.name
+        self.description = o.description
+        self.parent_guid = o.parent_guid
+        self.account_type_id = o.account_type_id
+        self.full_name = o.full_name
