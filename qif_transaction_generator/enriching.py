@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 def enrich_receipt_items_from_json(receipt):
-    assert receipt.items is None or len(
-        receipt.items) == 0, 'items must be empty'
+    #assert receipt.items is None or len(
+    #    receipt.items) == 0, 'items must be empty'
 
     try:
         json = from_string_to_json(receipt.raw)
@@ -30,7 +30,7 @@ def bind_items_to_categories(db_util, receipt):
     for item in receipt.items:
         logger.debug('item\'s name is \'%s\'', item.name)
         if item.account_guid:
-            logger.debug('item\'s had being bound \'%s\'', itme.account_guid)
+            logger.debug('item\'s had being bound \'%s\'', item.account_guid)
             continue
         phrases = _get_phrases(item.name)
         logger.debug('phrases: %s', phrases)

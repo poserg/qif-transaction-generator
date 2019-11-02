@@ -81,7 +81,8 @@ class App:
                 if receipt.raw is None:
                     logger.error('raw is empty for receipt(%d)', receipt.id)
                 else:
-                    enrich_receipt_items_from_json(receipt)
+                    if not receipt.items or len(receipt.items) == 0:
+                        enrich_receipt_items_from_json(receipt)
                     undefined_items = bind_items_to_categories(
                         self.db_util, receipt)
                     if len(undefined_items) == 0:
