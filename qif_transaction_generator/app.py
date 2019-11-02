@@ -83,10 +83,14 @@ class App:
                 else:
                     if not receipt.items or len(receipt.items) == 0:
                         enrich_receipt_items_from_json(receipt)
-                    undefined_items = bind_items_to_categories(
-                        self.db_util, receipt)
-                    if len(undefined_items) == 0:
-                        logger.debug('all items were found for receipt(%d)', receipt.id)
+                    if receipt.items and len(receipt.items) > 0:
+                        undefined_items = bind_items_to_categories(
+                            self.db_util, receipt)
+                        if len(undefined_items) == 0:
+                            logger.info('all items were found for receipt(%d)', receipt.id)
+                            receipt.status_id = StatusEnum.DONE.value
+                    else:
+                        logger.warn('receipt doesn\'t have any items')
             session.commit()
         except:
             session.rollback()

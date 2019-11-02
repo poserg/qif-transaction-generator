@@ -29,6 +29,7 @@ class StatusEnum(enum.Enum):
     FOUND = 2
     NOT_FOUND = 3
     LOADED = 4
+    DONE = 5
 
 
 class Receipt(Base):
