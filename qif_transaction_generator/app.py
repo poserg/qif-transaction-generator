@@ -137,4 +137,4 @@ class App:
         else:
             logger.info('search result:')
             for i in r:
-                logger.info(i.full_name)
+                logger.info(' ' + i.guid + ' : ' + i.full_name)

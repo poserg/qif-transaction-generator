@@ -63,10 +63,16 @@ class DBUtil:
                 Dictionary.weight.desc()).limit(1).all()
 
     def search_accounts(self, search_text):
-        st = '%' + search_text + '%'
-        return self.get_current_session().query(Account).filter(or_(
-            Account.name.ilike(st),
-            Account.description.ilike(st))).all()
+        r1 = self.get_current_session().query(Account).filter(or_(
+            Account.name.ilike(f'%{search_text}%'),
+            Account.description.ilike(f'%{search_text}%'))).all()
+        logger.debug('result of searching by name and desc: %s', r1)
+
+        r2 = self.get_current_session().query(Account).filter(
+            Account.parent_guid.in_([x.guid for x in r1])).all()
+        logger.debug('result of searching by parent guid: %s', r2)
+        r1.extend(r2)
+        return r1
 
     def get_all_accounts(self):
         return self.get_current_session().query(Account).all()
