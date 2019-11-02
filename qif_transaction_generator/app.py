@@ -123,7 +123,7 @@ class App:
         assert self.config.args.guid
 
         d = Dictionary(account_guid=self.config.args.guid,
-                       phrase=self.config.args.phrase,
+                       phrase=self.config.args.phrase.lower(),
                        weight=0)
         return self.db_util.create(d)
 
