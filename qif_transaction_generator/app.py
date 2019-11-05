@@ -56,7 +56,8 @@ class App:
 
         db_accounts = self.db_util.get_all_accounts()
 
-        to_add, to_delete, to_modify = get_difference_list(accounts, db_accounts)
+        to_add, to_delete, to_modify = get_difference_list(
+            accounts, db_accounts)
         logger.info('to_add: %s', to_add)
         logger.info('to_delete: %s', to_delete)
         logger.info('to_modify: %s', to_modify)
@@ -87,7 +88,9 @@ class App:
                         undefined_items = bind_items_to_categories(
                             self.db_util, receipt)
                         if len(undefined_items) == 0:
-                            logger.info('all items were found for receipt(%d)', receipt.id)
+                            logger.info(
+                                'all items were found for receipt(%d)',
+                                receipt.id)
                             receipt.status_id = StatusEnum.DONE.value
                     else:
                         logger.warn('receipt doesn\'t have any items')
@@ -132,14 +135,15 @@ class App:
                        weight=0)
         return self.db_util.create(d)
 
-    def search_accounts(self):
+    def search_accounts(self, search_text):
         logger.debug('start search_accounts')
-        assert self.config.args.search_text
+        assert search_text
 
-        r = self.db_util.search_accounts(self.config.args.search_text)
-        if len(r) == 0:
-            logger.info('search result is empty')
-        else:
+        r = self.db_util.search_accounts(search_text)
+        if r and len(r) > 0:
             logger.info('search result:')
             for i in r:
                 logger.info(' ' + i.guid + ' : ' + i.full_name)
+            return r
+        else:
+            logger.info('search result is empty')

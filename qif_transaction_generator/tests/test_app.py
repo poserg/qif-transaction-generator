@@ -6,6 +6,7 @@ from datetime import datetime
 from qif_transaction_generator.app import App
 from qif_transaction_generator.config import Config
 from qif_transaction_generator.dao import DBUtil
+from qif_transaction_generator.models import Account
 
 
 class TestAppWithoutInit(unittest.TestCase):
@@ -77,3 +78,43 @@ class TestAppAddPhrase(unittest.TestCase):
         self.assertEqual(args[0].account_guid, 'test_guid')
         self.assertEqual(args[0].phrase, 'test_phrase')
         self.assertEqual(args[0].weight, 0)
+
+
+class TestAppSearchAccounts(unittest.TestCase):
+
+    def test_search_accounts(self):
+        app = App()
+        app.db_util = mock.Mock()
+
+        root = Account(
+            guid='root_guid',
+            name='Root Account',
+            full_name='Root Account')
+        income = Account(
+            guid='income_guid',
+            name='Income Account',
+            full_name='Income Account')
+
+        app.db_util.search_accounts.return_value = [root, income]
+
+        result = app.search_accounts('search text')
+        app.db_util.search_accounts.assert_called_once_with('search text')
+        self.assertEqual(result, [root, income])
+
+    def test_search_accounts_with_empty_result(self):
+        app = App()
+        app.db_util = mock.Mock()
+
+        app.db_util.search_accounts.return_value = []
+        result = app.search_accounts('search text')
+        app.db_util.search_accounts.assert_called_once_with('search text')
+        self.assertEqual(result, None)
+
+    def test_search_accounts_without_result(self):
+        app = App()
+        app.db_util = mock.Mock()
+
+        app.db_util.search_accounts.return_value = None
+        result = app.search_accounts('search text')
+        app.db_util.search_accounts.assert_called_once_with('search text')
+        self.assertEqual(result, None)
