@@ -8,11 +8,12 @@ from qif_transaction_generator.models import Item, Receipt
 @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
 @mock.patch('qif_transaction_generator.enriching.parse_receipt')
 class TestEnrichingItemsFromJson(unittest.TestCase):
-    def test_items_empty(self, mock_parse_receipt, mock_from_string_to_json):
-        r = Receipt()
-        r.items = [Item()]
 
-        self.assertRaises(AssertionError, enrich_receipt_items_from_json, r)
+    # def test_items_empty(self, mock_parse_receipt, mock_from_string_to_json):
+    #     r = Receipt()
+    #     r.items = [Item()]
+
+    #     self.assertRaises(AssertionError, enrich_receipt_items_from_json, r)
 
     def test_right_case(self, mock_parse_receipt, mock_from_string_to_json):
         test_receipt = Receipt()
