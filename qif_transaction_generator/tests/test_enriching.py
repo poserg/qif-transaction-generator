@@ -1,7 +1,8 @@
 import unittest
 import unittest.mock as mock
 
-from qif_transaction_generator.enriching import enrich_receipt_items_from_json
+from qif_transaction_generator.enriching import enrich_receipt,\
+    _enrich_receipt_items_from_json
 from qif_transaction_generator.models import Item, Receipt
 
 
@@ -13,7 +14,7 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
     #     r = Receipt()
     #     r.items = [Item()]
 
-    #     self.assertRaises(AssertionError, enrich_receipt_items_from_json, r)
+    #     self.assertRaises(AssertionError, _enrich_receipt_items_from_json, r)
 
     def test_right_case(self, mock_parse_receipt, mock_from_string_to_json):
         test_receipt = Receipt()
@@ -26,7 +27,7 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
         r = Receipt()
         r.raw = 'test_raw'
 
-        enrich_receipt_items_from_json(r)
+        _enrich_receipt_items_from_json(r)
 
         mock_from_string_to_json.assert_called_once_with('test_raw')
         self.assertEqual(r.ecash_total_sum, 2)
@@ -43,7 +44,7 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
         r = Receipt()
         r.raw = 'test_raw'
 
-        enrich_receipt_items_from_json(r)
+        _enrich_receipt_items_from_json(r)
 
         mock_from_string_to_json.assert_called_once_with('test_raw')
         mock_parse_receipt.assert_not_called()
@@ -62,7 +63,7 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
         r = Receipt()
         r.raw = 'test_raw'
 
-        enrich_receipt_items_from_json(r)
+        _enrich_receipt_items_from_json(r)
 
         mock_from_string_to_json.assert_called_once_with('test_raw')
         mock_parse_receipt.assert_called_once_with('test_json')
@@ -70,3 +71,85 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
         self.assertIsNone(r.cash_total_sum)
         self.assertTrue(
             r.items is None or isinstance(r.items, list) and len(r.items) == 0)
+
+class TestEnrichingReceipts(unittest.TestCase):
+
+    def setUp(self):
+        self.db_util = mock.Mock()
+        self.session = mock.Mock()
+        self.db_util.begin_session.return_value = self.session
+
+    def test_enrich_for_empty_receipt(self):
+        empty_receipt = Receipt(id='test_id')
+        self.db_util.get_receipt_by_id.return_value = [empty_receipt]
+        enrich_receipt(self.db_util, 1)
+
+        self.db_util.begin_session.assert_called_once()
+        self.session.commit.assert_not_called()
+        self.session.rollback.assert_not_called()
+        self.session.close.assert_called_once()
+        self.db_util.get_receipt_by_id.assert_called_once_with(
+            self.session, [1])
+
+    @mock.patch('qif_transaction_generator.enriching._enrich_receipt_items_from_json')
+    @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
+    def test_enrich_one_receipt(self, mock_bind_items_to_categories, \
+            mock_enrich_receipt_items_from_json):
+        r = Receipt(id='test_id', raw='test_raw')
+        r.items = [Item()]
+        self.db_util.get_receipt_by_id.return_value = [r]
+        enrich_receipt(self.db_util, 2)
+
+        self.db_util.begin_session.assert_called_once()
+        self.db_util.get_receipt_by_id.assert_called_once_with(
+            self.session, [2])
+        self.session.commit.assert_called_once()
+        self.session.rollback.assert_not_called()
+        self.session.close.assert_called_once()
+        mock_enrich_receipt_items_from_json.assert_not_called()
+        mock_bind_items_to_categories.assert_called_once_with(self.db_util, r)
+        self.assertEqual(r.status_id, 5)
+
+    @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
+    @mock.patch('qif_transaction_generator.enriching.parse_receipt')
+    @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
+    def test_enrich_receipt_without_items(self, mock_bind_items_to_categories, \
+            mock_parse_receipt, mock_from_string_to_json):
+        r = Receipt(id='test_id', raw='test_raw')
+        self.db_util.get_receipt_by_id.return_value = [r]
+        mock_parse_receipt.return_value.items = [Item()]
+        # mock_enrich_receipt_items_from_json.return_value = [Item()]
+        enrich_receipt(self.db_util, 3)
+
+        self.db_util.begin_session.assert_called_once()
+        self.db_util.get_receipt_by_id.assert_called_once_with(
+            self.session, [3])
+        self.session.commit.assert_called_once()
+        self.session.rollback.assert_not_called()
+        self.session.close.assert_called_once()
+        mock_parse_receipt.assert_called_once()
+        mock_bind_items_to_categories.assert_called_once_with(self.db_util, r)
+        self.assertEqual(r.status_id, 5)
+
+    @mock.patch('qif_transaction_generator.enriching._enrich_receipt_items_from_json')
+    @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
+    def test_enrich_receipt_with_undefined_items(self, \
+            mock_bind_items_to_categories, \
+            mock_enrich_receipt_items_from_json):
+        r = Receipt(id='test_id', raw='test_raw', status_id=4)
+        item1 = Item()
+        item2 = Item()
+        r.items = [item1, item2]
+        self.db_util.get_receipt_by_id.return_value = [r]
+        mock_bind_items_to_categories.return_value = [item1]
+        enrich_receipt(self.db_util, 4)
+
+        self.db_util.begin_session.assert_called_once()
+        self.db_util.get_receipt_by_id.assert_called_once_with(
+            self.session, [4])
+        self.session.commit.assert_not_called()
+        self.session.rollback.assert_not_called()
+        self.session.close.assert_called_once()
+        mock_enrich_receipt_items_from_json.assert_not_called()
+        mock_bind_items_to_categories.assert_called_once_with(self.db_util, r)
+        self.assertEqual(r.status_id, 4)

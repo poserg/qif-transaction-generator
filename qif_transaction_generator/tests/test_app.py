@@ -1,5 +1,6 @@
 import unittest
 import unittest.mock as mock
+from unittest.mock import call
 
 from datetime import datetime
 
@@ -7,7 +8,6 @@ from qif_transaction_generator.app import App
 from qif_transaction_generator.config import Config
 from qif_transaction_generator.dao import DBUtil
 from qif_transaction_generator.models import Account
-
 
 class TestAppWithoutInit(unittest.TestCase):
 
@@ -118,3 +118,34 @@ class TestAppSearchAccounts(unittest.TestCase):
         result = app.search_accounts('search text')
         app.db_util.search_accounts.assert_called_once_with('search text')
         self.assertEqual(result, None)
+
+
+class TestAppEnrichReceipts(unittest.TestCase):
+
+    def setUp(self):
+        self.app = App()
+        self.app.db_util = mock.Mock()
+
+    @mock.patch('qif_transaction_generator.app.enrich_receipt')
+    def test_enrich_without_receipts(self, mock_enrich_receipt):
+        self.app.db_util.get_receipt_without_items_by_status.return_value = []
+        self.app.enrich_receipts()
+        mock_enrich_receipt.assert_not_called()
+
+    @mock.patch('qif_transaction_generator.app.enrich_receipt')
+    def test_enrich_one_receipt(self, mock_enrich_receipt):
+        self.app.db_util.get_receipt_without_items_by_status.return_value = [3]
+        self.app.enrich_receipts()
+
+        mock_enrich_receipt.assert_called_once_with(self.app.db_util, 3)
+
+    @mock.patch('qif_transaction_generator.app.enrich_receipt')
+    def test_enrich_multiple_receipts(self, mock_enrich_receipt):
+        self.app.db_util.get_receipt_without_items_by_status.return_value = \
+            [6, 3, 8]
+        self.app.enrich_receipts()
+
+        self.assertEqual(mock_enrich_receipt.call_args_list, [
+            call(self.app.db_util, 6),
+            call(self.app.db_util, 3),
+            call(self.app.db_util, 8)])

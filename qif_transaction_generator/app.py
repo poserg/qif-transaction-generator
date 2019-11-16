@@ -11,8 +11,7 @@ from qif_transaction_generator.models import Receipt, StatusEnum, \
 
 from qif_transaction_generator.gnucash import parse_accounts, \
     set_up_account_names, get_difference_list
-from qif_transaction_generator.enriching import bind_items_to_categories,\
-    enrich_receipt_items_from_json
+from qif_transaction_generator.enriching import enrich_receipt
 
 logger = logging.getLogger(__name__)
 
@@ -70,36 +69,13 @@ class App:
             self.db_util.commit_current_sesssion()
 
     def enrich_receipts(self):
-        session = self.db_util.begin_session()
-        try:
-            receipts = self.db_util.get_receipt_without_items_by_status(
-                session, [StatusEnum.LOADED.value])
-            logger.info('found %d receipt(s) for enriching' % len(receipts))
-            logger.debug(receipts)
+        receipts = self.db_util.get_receipt_without_items_by_status(
+            [StatusEnum.LOADED.value])
+        logger.info('found %d receipt(s) for enriching' % len(receipts))
+        logger.debug(receipts)
 
-            for receipt in receipts:
-                logger.info('process receipt(%s)', receipt)
-                if receipt.raw is None:
-                    logger.error('raw is empty for receipt(%d)', receipt.id)
-                else:
-                    if not receipt.items or len(receipt.items) == 0:
-                        enrich_receipt_items_from_json(receipt)
-                    if receipt.items and len(receipt.items) > 0:
-                        undefined_items = bind_items_to_categories(
-                            self.db_util, receipt)
-                        if len(undefined_items) == 0:
-                            logger.info(
-                                'all items were found for receipt(%d)',
-                                receipt.id)
-                            receipt.status_id = StatusEnum.DONE.value
-                    else:
-                        logger.warn('receipt doesn\'t have any items')
-            session.commit()
-        except:
-            session.rollback()
-            raise
-        finally:
-            session.close()
+        for id in receipts:
+            enrich_receipt(self.db_util, id)
 
     def _process_revise_receipt(self, session):
         receipts = self.db_util.get_receipt_by_status(

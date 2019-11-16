@@ -2,11 +2,41 @@ import logging
 
 from qif_transaction_generator.json_utils import from_string_to_json, \
     parse_receipt
+from qif_transaction_generator.models import StatusEnum
 
 logger = logging.getLogger(__name__)
 
+def enrich_receipt(db_util, receipt_id):
+    assert db_util
+    assert receipt_id
+    logger.info('process receipt(%s)', receipt_id)
+    session = db_util.begin_session()
+    try:
+        receipt = db_util.get_receipt_by_id(session, [receipt_id])[0]
+        if receipt.raw is None:
+            logger.error('raw is empty for receipt(%s)', receipt.id)
+        else:
+            if not receipt.items or len(receipt.items) == 0:
+                _enrich_receipt_items_from_json(receipt)
+            if receipt.items and len(receipt.items) > 0:
+                undefined_items = _bind_items_to_categories(
+                    db_util, receipt)
+                if len(undefined_items) == 0:
+                    logger.info(
+                        'all items were found for receipt(%d)',
+                        receipt.id)
+                    receipt.status_id = StatusEnum.DONE.value
+                    session.commit()
+            else:
+                logger.warning('receipt doesn\'t have any items')
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
-def enrich_receipt_items_from_json(receipt):
+
+def _enrich_receipt_items_from_json(receipt):
     #assert receipt.items is None or len(
     #    receipt.items) == 0, 'items must be empty'
 
@@ -24,7 +54,7 @@ def enrich_receipt_items_from_json(receipt):
         logger.exception('Couldn\'t convert raw to json. %s', receipt.raw)
 
 
-def bind_items_to_categories(db_util, receipt):
+def _bind_items_to_categories(db_util, receipt):
     logger.debug('start bind_items_to_categories')
     result = []
     for item in receipt.items:
