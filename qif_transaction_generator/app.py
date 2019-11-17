@@ -72,10 +72,10 @@ class App:
         receipts = self.db_util.get_receipt_without_items_by_status(
             [StatusEnum.LOADED.value])
         logger.info('found %d receipt(s) for enriching' % len(receipts))
-        logger.debug(receipts)
+        logger.debug('ids: %s', receipts)
 
-        for id in receipts:
-            enrich_receipt(self.db_util, id)
+        for r in receipts:
+            enrich_receipt(self.db_util, r.id)
 
     def _process_revise_receipt(self, session):
         receipts = self.db_util.get_receipt_by_status(

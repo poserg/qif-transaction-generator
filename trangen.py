@@ -39,7 +39,7 @@ def add_phrase():
 
 
 def search_accounts():
-    return app.search_accounts()
+    return app.search_accounts(config.args.search_text)
 
 
 def parse_arguments():

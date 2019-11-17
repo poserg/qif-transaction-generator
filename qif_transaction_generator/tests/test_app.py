@@ -7,7 +7,7 @@ from datetime import datetime
 from qif_transaction_generator.app import App
 from qif_transaction_generator.config import Config
 from qif_transaction_generator.dao import DBUtil
-from qif_transaction_generator.models import Account
+from qif_transaction_generator.models import Account, Item
 
 class TestAppWithoutInit(unittest.TestCase):
 
@@ -134,7 +134,8 @@ class TestAppEnrichReceipts(unittest.TestCase):
 
     @mock.patch('qif_transaction_generator.app.enrich_receipt')
     def test_enrich_one_receipt(self, mock_enrich_receipt):
-        self.app.db_util.get_receipt_without_items_by_status.return_value = [3]
+        self.app.db_util.get_receipt_without_items_by_status.return_value = [
+            Item(id=3)]
         self.app.enrich_receipts()
 
         mock_enrich_receipt.assert_called_once_with(self.app.db_util, 3)
@@ -142,7 +143,7 @@ class TestAppEnrichReceipts(unittest.TestCase):
     @mock.patch('qif_transaction_generator.app.enrich_receipt')
     def test_enrich_multiple_receipts(self, mock_enrich_receipt):
         self.app.db_util.get_receipt_without_items_by_status.return_value = \
-            [6, 3, 8]
+            [Item(id=6), Item(id=3), Item(id=8)]
         self.app.enrich_receipts()
 
         self.assertEqual(mock_enrich_receipt.call_args_list, [
