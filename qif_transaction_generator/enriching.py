@@ -29,9 +29,9 @@ def enrich_receipt(db_util, receipt_id):
                     session.commit()
             else:
                 logger.warning('receipt doesn\'t have any items')
-    except:
+    except Exception as e:
         session.rollback()
-        raise
+        raise e
     finally:
         session.close()
 

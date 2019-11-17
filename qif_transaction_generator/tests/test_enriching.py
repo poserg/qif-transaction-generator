@@ -131,6 +131,27 @@ class TestEnrichingReceipts(unittest.TestCase):
         mock_bind_items_to_categories.assert_called_once_with(self.db_util, r)
         self.assertEqual(r.status_id, 5)
 
+    @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
+    @mock.patch('qif_transaction_generator.enriching.parse_receipt')
+    @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
+    def test_enrich_without_items_after_parsing(self, mock_bind_items_to_categories, \
+            mock_parse_receipt, mock_from_string_to_json):
+        r = Receipt(id='test_id', raw='test_raw', status_id=4)
+        self.db_util.get_receipt_by_id.return_value = [r]
+        mock_parse_receipt.return_value.items = []
+        # mock_enrich_receipt_items_from_json.return_value = [Item()]
+        enrich_receipt(self.db_util, 6)
+
+        self.db_util.begin_session.assert_called_once()
+        self.db_util.get_receipt_by_id.assert_called_once_with(
+            self.session, [6])
+        self.session.commit.assert_not_called()
+        self.session.rollback.assert_not_called()
+        self.session.close.assert_called_once()
+        mock_parse_receipt.assert_called_once()
+        mock_bind_items_to_categories.assert_not_called()
+        self.assertEqual(r.status_id, 4)
+
     @mock.patch('qif_transaction_generator.enriching._enrich_receipt_items_from_json')
     @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
     def test_enrich_receipt_with_undefined_items(self, \
@@ -153,3 +174,14 @@ class TestEnrichingReceipts(unittest.TestCase):
         mock_enrich_receipt_items_from_json.assert_not_called()
         mock_bind_items_to_categories.assert_called_once_with(self.db_util, r)
         self.assertEqual(r.status_id, 4)
+
+    def test_enrich_with_rollback(self):
+        self.db_util.get_receipt_by_id.side_effect = Exception('test_exception')
+
+        with self.assertRaises(Exception) as context:
+            enrich_receipt(self.db_util, 5)
+
+        self.session.commit.assert_not_called()
+        self.session.rollback.assert_called_once()
+        self.session.close.assert_called_once()
+
