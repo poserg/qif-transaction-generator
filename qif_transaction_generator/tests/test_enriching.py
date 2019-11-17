@@ -244,8 +244,18 @@ class TestBindingItems(unittest.TestCase):
         self.assertEqual(item1.account_guid, 'test_guid1')
         self.assertListEqual(result, [item2])
 
+
 class TestGePhrases(unittest.TestCase):
 
     def test_get_phrases(self):
         result = _get_phrases('test')
-        self.assertEqual(result, 'test')
+        self.assertEqual(result, ['test'])
+
+        result = _get_phrases('TeSt 2')
+        self.assertEqual(result, ['test 2', 'test', '2'])
+
+        result = _get_phrases('The third tesT')
+        self.assertEqual(result, ['the third test', 'the', 'third', 'test'])
+
+        result = _get_phrases('Very long long string')
+        self.assertEqual(result, ['very long long string', 'very long long'])

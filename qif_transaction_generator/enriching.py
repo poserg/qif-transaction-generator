@@ -88,5 +88,6 @@ def _get_phrases(value):
     split = v.split(' ')
     if len(split) > 3:
         result.append(' '.join(split[:3]))
-    result.extend(split)
+    elif len(split) > 1:
+        result.extend(split)
     return result
