@@ -2,8 +2,9 @@ import unittest
 import unittest.mock as mock
 
 from qif_transaction_generator.enriching import enrich_receipt,\
-    _enrich_receipt_items_from_json
-from qif_transaction_generator.models import Item, Receipt
+    _enrich_receipt_items_from_json, _bind_items_to_categories, \
+    _get_phrases
+from qif_transaction_generator.models import Item, Receipt, Dictionary
 
 
 @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
@@ -185,3 +186,66 @@ class TestEnrichingReceipts(unittest.TestCase):
         self.session.rollback.assert_called_once()
         self.session.close.assert_called_once()
 
+class TestBindingItems(unittest.TestCase):
+
+    def setUp(self):
+        self.db_util = mock.Mock()
+
+    @mock.patch('qif_transaction_generator.enriching._get_phrases')
+    def test_bind_items_from_category(self, mock_get_phrases):
+        mock_get_phrases.return_value = 'test_phrase'
+        d1 = Dictionary(account_guid='test_guid1', weight=2)
+        d2 = Dictionary(account_guid='test_guid2', weight=5)
+        self.db_util.get_dictionaries_by_phrases.return_value = [d1, d2]
+
+        r = Receipt()
+        item = Item()
+        r.items = [item]
+        result = _bind_items_to_categories(self.db_util, r)
+
+        self.db_util.get_dictionaries_by_phrases.assert_called_once_with(
+            'test_phrase')
+        self.assertEqual(d1.account_guid, 'test_guid1')
+        self.assertEqual(d1.weight, 3)
+        self.assertEqual(d2.account_guid, 'test_guid2')
+        self.assertEqual(d2.weight, 5)
+        self.assertEqual(item.account_guid, 'test_guid1')
+        self.assertListEqual(result, [])
+
+    @mock.patch('qif_transaction_generator.enriching._get_phrases')
+    def test_bind_items_with_binded_item_yet(self, mock_get_phrases):
+        r = Receipt()
+        item = Item(account_guid='test_account_guid')
+        r.items = [item]
+        result = _bind_items_to_categories(self.db_util, r)
+
+        self.db_util.get_dictionaries_by_phrases.assert_not_called()
+        mock_get_phrases.assert_not_called()
+        self.assertEqual(item.account_guid, 'test_account_guid')
+        self.assertListEqual(result, [])
+
+    @mock.patch('qif_transaction_generator.enriching._get_phrases')
+    def test_bind_items_with_undefined_(self, mock_get_phrases):
+        mock_get_phrases.return_value = 'test_phrase'
+        d1 = Dictionary(account_guid='test_guid1', weight=2)
+        d2 = Dictionary(account_guid='test_guid2', weight=5)
+        self.db_util.get_dictionaries_by_phrases.side_effect = [[d1, d2], []]
+
+        r = Receipt()
+        item1 = Item(name='item with exist phrase')
+        item2 = Item(name='item wasn\'t existed')
+        r.items = [item1, item2]
+        result = _bind_items_to_categories(self.db_util, r)
+
+        self.assertEqual(d1.account_guid, 'test_guid1')
+        self.assertEqual(d1.weight, 3)
+        self.assertEqual(d2.account_guid, 'test_guid2')
+        self.assertEqual(d2.weight, 5)
+        self.assertEqual(item1.account_guid, 'test_guid1')
+        self.assertListEqual(result, [item2])
+
+class TestGePhrases(unittest.TestCase):
+
+    def test_get_phrases(self):
+        result = _get_phrases('test')
+        self.assertEqual(result, 'test')

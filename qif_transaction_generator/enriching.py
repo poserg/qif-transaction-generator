@@ -48,15 +48,16 @@ def _enrich_receipt_items_from_json(receipt):
             receipt.cash_total_sum = parse.cash_total_sum
             receipt.items = parse.items
         except Exception as e:
-            logger.exception('Couldn\'t parse json. It\'s a wrong format: %s, %s',
-                         e, json)
+            logger.exception(
+                'Couldn\'t parse json. It\'s a wrong format: %s, %s',
+                 e, json)
     except Exception as e:
         logger.exception('Couldn\'t convert raw to json. %s', receipt.raw)
 
 
 def _bind_items_to_categories(db_util, receipt):
     logger.debug('start bind_items_to_categories')
-    result = []
+    undefined_items = []
     for item in receipt.items:
         logger.debug('item\'s name is \'%s\'', item.name)
         if item.account_guid:
@@ -72,11 +73,11 @@ def _bind_items_to_categories(db_util, receipt):
             d[0].weight = d[0].weight + 1
             logger.debug('set weight %d for dictionary %s', d[0].weight, d[0])
         else:
-            logger.warn('dictionaries weren\'t found for item: %s', item.name)
-            result.append(item)
+            logger.warning('dictionaries weren\'t found for item: %s', item.name)
+            undefined_items.append(item)
 
     logger.debug('finish bind_items_to_categories')
-    return result
+    return undefined_items
 
 
 def _get_phrases(value):
