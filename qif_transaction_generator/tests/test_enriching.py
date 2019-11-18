@@ -258,4 +258,13 @@ class TestGePhrases(unittest.TestCase):
         self.assertEqual(result, ['the third test', 'the', 'third', 'test'])
 
         result = _get_phrases('Very long long string')
-        self.assertEqual(result, ['very long long string', 'very long long'])
+        self.assertEqual(result, ['very long long string',
+                                  'very long long', 'very',
+                                  'long', 'long'])
+
+        result = _get_phrases('сыр раненбургъ качокавалло 45% 300г')
+        self.assertEqual(result, ['сыр раненбургъ качокавалло 45% 300г',
+                                  'сыр раненбургъ качокавалло',
+                                  'сыр',
+                                  'раненбургъ',
+                                  'качокавалло'])

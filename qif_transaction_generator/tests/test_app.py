@@ -9,6 +9,7 @@ from qif_transaction_generator.config import Config
 from qif_transaction_generator.dao import DBUtil
 from qif_transaction_generator.models import Account, Item
 
+
 class TestAppWithoutInit(unittest.TestCase):
 
     @mock.patch.object(DBUtil, '__init__', lambda x, y: None)

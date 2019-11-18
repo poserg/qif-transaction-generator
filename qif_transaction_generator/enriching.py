@@ -37,6 +37,7 @@ def enrich_receipt(db_util, receipt_id):
 
 
 def _enrich_receipt_items_from_json(receipt):
+    logger.debug('start enrich receipt items from json for %s', receipt.id)
     #assert receipt.items is None or len(
     #    receipt.items) == 0, 'items must be empty'
 
@@ -88,6 +89,6 @@ def _get_phrases(value):
     split = v.split(' ')
     if len(split) > 3:
         result.append(' '.join(split[:3]))
-    elif len(split) > 1:
-        result.extend(split)
+    if len(split) > 1:
+        result.extend(split[:3])
     return result
