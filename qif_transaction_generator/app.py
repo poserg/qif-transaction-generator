@@ -123,3 +123,10 @@ class App:
             return r
         else:
             logger.info('search result is empty')
+
+    def generate_transaction(self):
+        receipts = self.db_util.get_receipts_by_status_with_items_and_accounts(
+            [StatusEnum.DONE.value])
+
+        if receipts:
+            pass

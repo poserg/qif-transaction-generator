@@ -44,5 +44,5 @@ def downgrade():
                         ['accounts.guid'],
                     ), sa.ForeignKeyConstraint(
                         ['item_id'],
-         s               ['items.id'],
+                        ['items.id'],
                     ), sa.PrimaryKeyConstraint('id'))

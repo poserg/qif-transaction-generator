@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 def from_string_to_json(raw):
     assert raw, 'raw mustn\'t be empty'
-    #escape_raw = raw.replace('"', '\\"').replace('\'', '"')
-    #logger.debug('escape_raw: %s ', escape_raw)
+    # escape_raw = raw.replace('"', '\\"').replace('\'', '"')
+    # logger.debug('escape_raw: %s ', escape_raw)
     return j.loads(raw)
 
 
