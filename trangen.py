@@ -101,22 +101,25 @@ def parse_arguments():
     parser_enrich.set_defaults(func=enrich)
 
     # create the parser for the "add-phrase" command
-    add_prase = subparsers.add_parser(
+    add_phrase_parser = subparsers.add_parser(
         'add-phrase', aliases=['b'], description='add phrase to dictionary')
-    add_prase.set_defaults(func=add_phrase)
-    add_prase.add_argument('guid', help='account guid')
-    add_prase.add_argument('phrase')
+    add_phrase_parser.set_defaults(func=add_phrase)
+    add_phrase_parser.add_argument('guid', help='account guid')
+    add_phrase_parser.add_argument('phrase')
 
     # create the parser for the "search-account" command
-    search_accounts = subparsers.add_parser(
+    search_accounts_parser = subparsers.add_parser(
         'search-accounts', aliases=['sa'], description='search accounts')
-    search_accounts.set_defaults(func=search_accounts)
-    search_accounts.add_argument('search_text', help='search text')
+    search_accounts_parser.set_defaults(func=search_accounts)
+    search_accounts_parser.add_argument('search_text', help='search text')
 
     # create the parser for the "generate-transaction" command
-    generate_transaction = subparsers.add_parser(
-        'generate-transaction', aliases=['gt'], description='generate transaction')
-    generate_transaction.set_defaults(func=generate_transaction)
+    generate_transaction_parser = subparsers.add_parser(
+        'generate-transaction',
+        aliases=['gt'],
+        description='generate transaction')
+    # generate_transaction_parser.add_argument('output_file')
+    generate_transaction_parser.set_defaults(func=generate_transaction)
 
     args = parser.parse_args()
     return args
