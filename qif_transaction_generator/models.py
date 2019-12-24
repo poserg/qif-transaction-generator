@@ -71,6 +71,7 @@ class Item(Base):
     sum = Column(Integer, nullable=False)
 
     account_guid = Column(String(32), ForeignKey('accounts.guid'))
+    account = relationship('Account')
 
     def __repr__(self):
         return "<Item(name = '%s', price = '%d', quantity = '%d', sum = '%d', account_guid = '%s')>" % (

@@ -3,7 +3,7 @@
 import logging
 
 from sqlalchemy import create_engine, or_
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 
 from qif_transaction_generator.models import Receipt, Dictionary, Item, \
     Account
@@ -94,5 +94,6 @@ class DBUtil:
         self.get_current_session().commit()
 
     def get_receipts_by_status_with_items_and_accounts(self, status_ids):
-        return self.get_current_session().query(Receipt).join(Item).\
-            join(Account).filter(Receipt.status.id.in_(status_ids)).all()
+        return self.get_current_session().query(Receipt) \
+            .options(joinedload(Receipt.items).joinedload(Item.account)) \
+            .filter(Receipt.status_id.in_(status_ids)).all()

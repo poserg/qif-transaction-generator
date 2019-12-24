@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import logging
+logger = logging.getLogger(__name__)
+
 class Account:
 
     def __init__(self, category, description, amount):
@@ -17,8 +20,8 @@ class Account:
 class Transaction:
 
     def __init__(self, source, date, amount, description, accounts):
-        assert type(accounts) is list, '"accounts must be list"'
-        assert len(accounts) > 0, '"accounts" mustn\'t be empty'
+        #assert type(accounts) is list, '"accounts must be list"'
+        #assert len(accounts) > 0, '"accounts" mustn\'t be empty'
         self.source = source
         self.date = date
         self.amount = amount
@@ -76,3 +79,12 @@ class Transaction:
         result.append('^')
 
         return result
+
+def convert(receipts):
+    result = []
+    for r in receipts:
+        accounts = [Account(item.account.full_name, 'description', item.sum) for item in r.items]
+        t = Transaction('test', r.purchase_date, r.ecash_total_sum, 'description', accounts)
+        result.append(t)
+        logger.debug(t.dump())
+    return result

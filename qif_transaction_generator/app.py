@@ -12,6 +12,7 @@ from qif_transaction_generator.models import Receipt, StatusEnum, \
 from qif_transaction_generator.gnucash import parse_accounts, \
     set_up_account_names, get_difference_list
 from qif_transaction_generator.enriching import enrich_receipt
+from qif_transaction_generator.transaction import convert
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +128,5 @@ class App:
     def generate_transaction(self):
         receipts = self.db_util.get_receipts_by_status_with_items_and_accounts(
             [StatusEnum.DONE.value])
-
         if receipts:
-            pass
+            convert(receipts)
