@@ -125,8 +125,10 @@ class App:
         else:
             logger.info('search result is empty')
 
-    def generate_transaction(self):
+    def generate_transaction(self, output_file):
         receipts = self.db_util.get_receipts_by_status_with_items_and_accounts(
             [StatusEnum.DONE.value])
         if receipts:
-            convert(receipts)
+            transactions = convert(receipts)
+            for t in transactions:
+                output_file.write('\n'.join(t.dump()))

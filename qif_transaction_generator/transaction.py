@@ -58,7 +58,8 @@ class Transaction:
         result.append('T' + '%.2f' % self.amount)
 
         # Payee
-        result.append('P' + self.description)
+        if self.description:
+            result.append('P' + self.description)
 
         if len(self.accounts) == 1:
             # Category
@@ -70,7 +71,8 @@ class Transaction:
                 result.append('S' + account.category)
 
                 # Memo in split
-                result.append('E' + account.description)
+                if account.description:
+                    result.append('E' + account.description)
 
                 # Dollar amount of split
                 result.append('$' + '%.2f' % account.amount)
@@ -83,8 +85,7 @@ class Transaction:
 def convert(receipts):
     result = []
     for r in receipts:
-        accounts = [Account(item.account.full_name, 'description', item.sum) for item in r.items]
-        t = Transaction('test', r.purchase_date, r.ecash_total_sum, 'description', accounts)
+        accounts = [Account(item.account.full_name, None, item.sum) for item in r.items]
+        t = Transaction('test', r.purchase_date, float(r.total)/100, None, accounts)
         result.append(t)
-        logger.debug(t.dump())
     return result

@@ -42,7 +42,8 @@ def search_accounts():
     return app.search_accounts(config.args.search_text)
 
 def generate_transaction():
-    return app.generate_transaction()
+    app.generate_transaction(config.args.output_file)
+    config.args.output_file.close()
 
 
 def parse_arguments():
@@ -118,7 +119,7 @@ def parse_arguments():
         'generate-transaction',
         aliases=['gt'],
         description='generate transaction')
-    # generate_transaction_parser.add_argument('output_file')
+    generate_transaction_parser.add_argument('output_file', type=argparse.FileType('w', encoding='UTF-8'), help='output file')
     generate_transaction_parser.set_defaults(func=generate_transaction)
 
     args = parser.parse_args()
