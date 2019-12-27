@@ -126,9 +126,12 @@ class App:
             logger.info('search result is empty')
 
     def generate_transaction(self, output_file):
+        logger.debug('start generate transaction')
         receipts = self.db_util.get_receipts_by_status_with_items_and_accounts(
             [StatusEnum.DONE.value])
         if receipts:
+            logger.debug('Found %d receipt(s) with status DONE', len(receipts))
             transactions = convert(receipts)
             for t in transactions:
+                logger.debug('Write transaction {%s} to file', t)
                 output_file.write('\n'.join(t.dump()))

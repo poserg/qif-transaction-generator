@@ -20,8 +20,8 @@ class Account:
 class Transaction:
 
     def __init__(self, source, date, amount, description, accounts):
-        #assert type(accounts) is list, '"accounts must be list"'
-        #assert len(accounts) > 0, '"accounts" mustn\'t be empty'
+        assert type(accounts) is list, '"accounts must be list"'
+        assert len(accounts) > 0, '"accounts" mustn\'t be empty'
         self.source = source
         self.date = date
         self.amount = amount
@@ -45,6 +45,8 @@ class Transaction:
         # Source account
         result.append('N' + self.source)
 
+        result.append('TCash')
+
         # End of the entry
         result.append('^')
 
@@ -52,10 +54,10 @@ class Transaction:
         result.append('!Type:Cash')
 
         # Date
-        result.append('D' + self.date.strftime('%m/%d/%y'))
+        result.append('D' + self.date.strftime('%m/%d/%Y'))
 
         # Amount
-        result.append('T' + '%.2f' % self.amount)
+        result.append('U' + '-%.2f' % self.amount)
 
         # Payee
         if self.description:
@@ -75,7 +77,7 @@ class Transaction:
                     result.append('E' + account.description)
 
                 # Dollar amount of split
-                result.append('$' + '%.2f' % account.amount)
+                result.append('$' + '-%.2f' % account.amount)
 
         # End of the entry
         result.append('^')
@@ -83,6 +85,7 @@ class Transaction:
         return result
 
 def convert(receipts):
+    logger.debug('start convert receipt to qif transaction')
     result = []
     for r in receipts:
         accounts = [Account(item.account.full_name, None, item.sum) for item in r.items]
