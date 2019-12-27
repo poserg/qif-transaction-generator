@@ -40,7 +40,7 @@ def parse_accounts(file_path):
 
 def set_up_account_names(accounts):
     '''
-    В имя счёта добавляется имя родиельского счёта
+    В имя счёта добавляется имя родительского счёта
     '''
     d = {}
     for a in accounts:
@@ -53,13 +53,22 @@ def _get_full_account_name(d, guid):
     # import pdb; pdb.set_trace()
     logger.debug('start _get_full_account_name(%s)', guid)
     account = d[guid]
-    logger.debug('account\'s name is %s', account.name)
+    logger.debug('account\'s name is %s; parent guid is %s',
+                 account.name, account.parent_guid)
+    name = account.name
+    if AccountTypeEnum.ROOT.value == account.account_type_id:
+        logger.debug('account type is ROOT. Will be used empty name')
+        name = ''
     if account.parent_guid:
-        logger.debug('has parent with guid %s', account.name, account.parent_guid)
-        return _get_full_account_name(d, account.parent_guid) + ':' + account.name
+        logger.debug('has parent')
+        parent_name = _get_full_account_name(d, account.parent_guid)
+        if len(parent_name) == 0:
+            return name
+        else:
+            return parent_name + ':' + name
     else:
         logger.debug('hasn\'t parent')
-        return account.name
+        return name
 
 
 def get_difference_list(accounts, db_accounts):
