@@ -5,6 +5,8 @@ from qif_transaction_generator.models import Item, Receipt
 
 logger = logging.getLogger(__name__)
 
+ratio = 100
+
 
 def from_string_to_json(raw):
     assert raw, 'raw mustn\'t be empty'
@@ -21,17 +23,17 @@ def parse_receipt(json):
         r = json['document']['receipt']
     else:
         r = json
-    receipt.ecash_total_sum = r['ecashTotalSum']
-    receipt.cash_total_sum = r['cashTotalSum']
+    receipt.ecash_total_sum = r['ecashTotalSum'] / ratio
+    receipt.cash_total_sum = r['cashTotalSum'] / ratio
 
     receipt.items = []
     for i in r['items']:
         logger.debug('process item %s', i)
         item = Item()
         item.name = i['name']
-        item.price = i['price']
+        item.price = i['price'] / ratio
         item.quantity = i['quantity']
-        item.sum = i['sum']
+        item.sum = i['sum'] / ratio
 
         receipt.items.append(item)
 

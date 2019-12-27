@@ -55,25 +55,25 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
                     'ecashTotalSum':
                     1211,
                     'cashTotalSum':
-                    33,
+                    3300,
                     'items': [{
                         'name': 'item_name',
-                        'price': 2,
+                        'price': 20,
                         'quantity': 31,
-                        'sum': 62
+                        'sum': 620
                     }]
                 }
             }
         }
         r = parse_receipt(s)
 
-        self.assertEqual(r.ecash_total_sum, 1211)
+        self.assertEqual(r.ecash_total_sum, 12.11)
         self.assertEqual(r.cash_total_sum, 33)
         self.assertEqual(len(r.items), 1)
         self.assertEqual(r.items[0].name, 'item_name')
-        self.assertEqual(r.items[0].price, 2)
+        self.assertEqual(r.items[0].price, 0.2)
         self.assertEqual(r.items[0].quantity, 31)
-        self.assertEqual(r.items[0].sum, 62)
+        self.assertEqual(r.items[0].sum, 6.2)
 
     def test_parse_receipt_with_two_items(self):
         s = {
@@ -82,31 +82,31 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
                     'ecashTotalSum':
                     1211,
                     'cashTotalSum':
-                    33,
+                    3300,
                     'items': [{
                         'name': 'item_name_1',
-                        'price': 2,
+                        'price': 20,
                         'quantity': 31,
-                        'sum': 62
+                        'sum': 620
                     }, {
                         'name': 'item_name_2',
-                        'price': 1,
+                        'price': 10,
                         'quantity': 33,
-                        'sum': 34
+                        'sum': 330
                     }]
                 }
             }
         }
         r = parse_receipt(s)
 
-        self.assertEqual(r.ecash_total_sum, 1211)
+        self.assertEqual(r.ecash_total_sum, 12.11)
         self.assertEqual(r.cash_total_sum, 33)
         self.assertEqual(len(r.items), 2)
         self.assertEqual(r.items[0].name, 'item_name_1')
-        self.assertEqual(r.items[0].price, 2)
+        self.assertEqual(r.items[0].price, 0.2)
         self.assertEqual(r.items[0].quantity, 31)
-        self.assertEqual(r.items[0].sum, 62)
+        self.assertEqual(r.items[0].sum, 6.2)
         self.assertEqual(r.items[1].name, 'item_name_2')
-        self.assertEqual(r.items[1].price, 1)
+        self.assertEqual(r.items[1].price, 0.1)
         self.assertEqual(r.items[1].quantity, 33)
-        self.assertEqual(r.items[1].sum, 34)
+        self.assertEqual(r.items[1].sum, 3.3)
