@@ -32,8 +32,8 @@ class StatusEnum(enum.Enum):
     DONE = 5
 
 
-class Receipt(Base):
-    __tablename__ = 'receipts'
+class FnsReceipt(Base):
+    __tablename__ = 'fns_receipts'
 
     id = Column(Integer, primary_key=True)
     fn = Column(String, nullable=False)
@@ -41,7 +41,28 @@ class Receipt(Base):
     fd = Column(String, nullable=False)
     purchase_date = Column(DateTime, nullable=False)
     total = Column(String, nullable=False)
-    raw = Column(Text)
+
+    status_id = Column(Integer, ForeignKey('statuses.id'), nullable=False)
+    status = relationship('Status')
+
+    def __repr__(self):
+        return "<Receipt(id = %s fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
+            self.id,
+            self.fn,
+            self.fp,
+            self.fd,
+            self.purchase_date,
+            self.total,
+            self.status_id if self.status is None else self.status.code)
+
+
+class Receipt(Base):
+    __tablename__ = 'receipts'
+
+    id = Column(Integer, primary_key=True)
+    purchase_date = Column(DateTime)
+    total = Column(Integer)
+    raw = Column(Text, nullable=False)
     ecash_total_sum = Column(Integer)
     cash_total_sum = Column(Integer)
 
@@ -49,15 +70,15 @@ class Receipt(Base):
     status_id = Column(Integer, ForeignKey('statuses.id'), nullable=False)
     status = relationship('Status')
 
+    fns_receipt_id = Column(Integer, ForeignKey('fns_receipts.id'))
+    fns_receipt = relationship('FnsReceipt')
+
     def __repr__(self):
-        return "<Receipt(id = %s fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
+        return "<Receipt(id = %s purchase_date = '%s', total = %s, status = %s)>" % (
             self.id,
-                self.fn,
-                self.fp,
-                self.fd,
-                self.purchase_date,
-                self.total,
-                self.status_id if self.status is None else self.status.code)
+            self.purchase_date,
+            self.total,
+            self.status_id if self.status is None else self.status.code)
 
 
 class Item(Base):

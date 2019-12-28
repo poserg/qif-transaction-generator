@@ -7,7 +7,7 @@ from fns import check_receipt, revise_info
 from qif_transaction_generator.dao import DBUtil
 from qif_transaction_generator.config import Config
 from qif_transaction_generator.models import Receipt, StatusEnum, \
-    Dictionary
+    Dictionary, FnsReceipt
 
 from qif_transaction_generator.gnucash import parse_accounts, \
     set_up_account_names, get_difference_list
@@ -28,12 +28,13 @@ class App:
     def add_receipt(self, fn, fp, fd, purchase_date, total):
         assert self.db_util, 'App must be init'
         date = dateutil.parser.parse(purchase_date)
-        r = Receipt(fn=fn,
-                    fp=fp,
-                    fd=fd,
-                    purchase_date=date,
-                    total=total,
-                    status_id=StatusEnum.CREATED.value)
+        r = FnsReceipt(
+            fn=fn,
+            fp=fp,
+            fd=fd,
+            purchase_date=date,
+            total=total,
+            status_id=StatusEnum.CREATED.value)
         return self.db_util.create_receipt(r)
 
     def revise_receipt(self):
@@ -84,22 +85,26 @@ class App:
         logger.info('found %d receipt(s) for revising' % len(receipts))
         logger.debug(receipts)
 
-        for r in receipts:
-            logger.info('revising %s' % r)
-            if check_receipt(r):
-                r.status_id = StatusEnum.FOUND.value
+        for fns_r in receipts:
+            logger.info('revising %s' % fns_r)
+            if check_receipt(fns_r):
+                fns_r.status_id = StatusEnum.FOUND.value
                 logger.debug('receipt exists')
-                info = revise_info(r, self.config.login, self.config.password)
+                info = revise_info(fns_r, self.config.login, self.config.password)
                 try:
                     logger.debug('info: %s' % info.json())
-                    r.raw = str(info.json())
-                    r.status_id = StatusEnum.LOADED.value
+                    fns_r.status_id = StatusEnum.LOADED.value
+                    r = Receipt(
+                        status_id=StatusEnum.LOADED.value,
+                        fns_receipt_id=fns_r.id,
+                        raw=str(info.json()))
+                    session.add(r)
                 except:
                     logger.warning('info isn\'t a json')
-                    r.status_id = StatusEnum.NOT_FOUND.value
+                    fns_r.status_id = StatusEnum.NOT_FOUND.value
             else:
                 logger.warning('receipt doesn\'t exist')
-                r.status_id = StatusEnum.NOT_FOUND.value
+                fns_r.status_id = StatusEnum.NOT_FOUND.value
         if len(receipts) == 0:
             logger.info('there\'re not receipts for revising')
 

@@ -41,6 +41,12 @@ class DBUtil:
         result = query.all()
         return result
 
+    def get_fnsreceipt_by_status(self, session, status_ids):
+        query = session.query(FnsReceipt).filter(
+            FnsReceipt.status_id.in_(status_ids))
+        result = query.all()
+        return result
+
     def get_receipt_by_id(self, session, ids):
         query = session.query(Receipt).filter(
             Receipt.id.in_(ids))
