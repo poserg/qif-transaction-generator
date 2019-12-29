@@ -1,6 +1,8 @@
 import unittest
 import unittest.mock as mock
 
+import datetime
+
 from qif_transaction_generator.json_utils import from_string_to_json, \
     parse_receipt
 from qif_transaction_generator.models import Receipt, Item
@@ -61,7 +63,9 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
                         'price': 20,
                         'quantity': 31,
                         'sum': 620
-                    }]
+                    }],
+                    'totalSum': 4511,
+                    'dateTime': 1557385440
                 }
             }
         }
@@ -69,6 +73,8 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
 
         self.assertEqual(r.ecash_total_sum, 12.11)
         self.assertEqual(r.cash_total_sum, 33)
+        self.assertEqual(r.total_sum, 45.11)
+        self.assertEqual(r.purchase_date, datetime.datetime(2019, 5, 9, 10, 4))
         self.assertEqual(len(r.items), 1)
         self.assertEqual(r.items[0].name, 'item_name')
         self.assertEqual(r.items[0].price, 0.2)
@@ -93,7 +99,9 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
                         'price': 10,
                         'quantity': 33,
                         'sum': 330
-                    }]
+                    }],
+                    'totalSum': 4511,
+                    'dateTime': 1557385440
                 }
             }
         }
@@ -101,6 +109,8 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
 
         self.assertEqual(r.ecash_total_sum, 12.11)
         self.assertEqual(r.cash_total_sum, 33)
+        self.assertEqual(r.total_sum, 45.11)
+        self.assertEqual(r.purchase_date, datetime.datetime(2019, 5, 9, 10, 4))
         self.assertEqual(len(r.items), 2)
         self.assertEqual(r.items[0].name, 'item_name_1')
         self.assertEqual(r.items[0].price, 0.2)

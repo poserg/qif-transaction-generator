@@ -30,13 +30,14 @@ class StatusEnum(enum.Enum):
     NOT_FOUND = 3
     LOADED = 4
     DONE = 5
+    CREATED_FROM_FILE = 6
 
 
 class FnsReceipt(Base):
     __tablename__ = 'fns_receipts'
 
     id = Column(Integer, primary_key=True)
-    fn = Column(String, nullable=False)
+    fn = Column(String)
     fp = Column(String, nullable=False)
     fd = Column(String, nullable=False)
     purchase_date = Column(DateTime, nullable=False)
@@ -47,7 +48,7 @@ class FnsReceipt(Base):
 
     def __repr__(self):
         return "<Receipt(id = %s fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
-            self.id,
+                self.id,
             self.fn,
             self.fp,
             self.fd,

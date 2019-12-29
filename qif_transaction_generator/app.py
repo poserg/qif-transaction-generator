@@ -72,7 +72,7 @@ class App:
 
     def enrich_receipts(self):
         receipts = self.db_util.get_receipt_without_items_by_status(
-            [StatusEnum.LOADED.value])
+            [StatusEnum.LOADED.value, StatusEnum.CREATED_FROM_FILE.value])
         logger.info('found %d receipt(s) for enriching' % len(receipts))
         logger.debug('ids: %s', receipts)
 
@@ -140,3 +140,8 @@ class App:
             for t in transactions:
                 logger.debug('Write transaction {%s} to file', t)
                 output_file.write('\n'.join(t.dump()))
+
+    def add_json(self, json_file):
+        r = Receipt(raw=json_file.read(),
+                    status_id=StatusEnum.CREATED_FROM_FILE.value)
+        return self.db_util.create_receipt(r)

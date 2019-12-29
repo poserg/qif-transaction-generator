@@ -47,6 +47,8 @@ def _enrich_receipt_items_from_json(receipt):
             parse = parse_receipt(json)
             receipt.ecash_total_sum = parse.ecash_total_sum
             receipt.cash_total_sum = parse.cash_total_sum
+            receipt.total = parse.total_sum
+            receipt.purchase_date = parse.purchase_date
             receipt.items = parse.items
         except Exception as e:
             logger.exception(

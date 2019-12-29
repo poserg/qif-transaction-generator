@@ -45,6 +45,9 @@ def generate_transaction():
     app.generate_transaction(config.args.output_file)
     config.args.output_file.close()
 
+def add_json():
+    app.add_json(config.args.json_file)
+    config.args.json_file.close()
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -119,8 +122,17 @@ def parse_arguments():
         'generate-transaction',
         aliases=['gt'],
         description='generate transaction')
-    generate_transaction_parser.add_argument('output_file', type=argparse.FileType('w', encoding='UTF-8'), help='output file')
+    generate_transaction_parser.add_argument('output_file',
+        type=argparse.FileType('w', encoding='UTF-8'), help='output file')
     generate_transaction_parser.set_defaults(func=generate_transaction)
+
+    # create the parser for the "add-receipt-json" command
+    parser_add_json = subparsers.add_parser('add-json',
+        aliases=['a'], description='Add new receipt\'s json')
+    parser_add_json.set_defaults(func=add_json)
+    parser_add_json.add_argument('json_file',
+        type=argparse.FileType('r', encoding='UTF-8'),
+        help='receipt\'s json')
 
     args = parser.parse_args()
     return args

@@ -1,4 +1,5 @@
 import json as j
+import datetime
 import logging
 
 from qif_transaction_generator.models import Item, Receipt
@@ -25,6 +26,9 @@ def parse_receipt(json):
         r = json
     receipt.ecash_total_sum = r['ecashTotalSum'] / ratio
     receipt.cash_total_sum = r['cashTotalSum'] / ratio
+    receipt.total_sum = r['totalSum'] / ratio
+    receipt.purchase_date = datetime.datetime\
+        .fromtimestamp(r['dateTime'])
 
     receipt.items = []
     for i in r['items']:
