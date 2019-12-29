@@ -62,7 +62,10 @@ class Receipt(Base):
 
     id = Column(Integer, primary_key=True)
     purchase_date = Column(DateTime)
+
+    # для простоты используется целое - нужно делить на 100 при выгрузке
     total = Column(Integer)
+
     raw = Column(Text, nullable=False)
     ecash_total_sum = Column(Integer)
     cash_total_sum = Column(Integer)

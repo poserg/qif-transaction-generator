@@ -3,6 +3,8 @@
 import logging
 logger = logging.getLogger(__name__)
 
+ratio = 100
+
 class Account:
 
     def __init__(self, category, description, amount):
@@ -88,7 +90,7 @@ def convert(receipts):
     logger.debug('start convert receipt to qif transaction')
     result = []
     for r in receipts:
-        accounts = [Account(item.account.full_name, None, item.sum) for item in r.items]
-        t = Transaction('test', r.purchase_date, float(r.total)/100, None, accounts)
+        accounts = [Account(item.account.full_name, None, item.sum / ratio) for item in r.items]
+        t = Transaction('test', r.purchase_date, r.total / ratio, None, accounts)
         result.append(t)
     return result

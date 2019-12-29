@@ -16,13 +16,13 @@ class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
         i2 = models.Item(name='item 2', sum=200, account=a2)
         r = models.Receipt(id='receipt_1',
                            purchase_date='my date',
-                           total='300', items=[i1, i2])
+                           total=302, items=[i1, i2])
         result = transaction.convert([r])
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].source, 'test')
         self.assertEqual(result[0].date, 'my date')
-        self.assertEqual(result[0].amount, 3)
+        self.assertEqual(result[0].amount, 3.02)
         self.assertEqual(result[0].description, None)
 
         self.assertEqual(len(result[0].accounts), 2)
@@ -37,7 +37,7 @@ class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
     def test_with_empty_accounts(self):
         r = models.Receipt(id='receipt_1',
                    purchase_date='my date',
-                   total='300', items=[])
+                   total=305, items=[])
 
         self.assertRaises(AssertionError, transaction.convert, [r])
 
