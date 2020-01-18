@@ -99,7 +99,8 @@ class DBUtil:
     def commit_current_sesssion(self):
         self.get_current_session().commit()
 
-    def get_receipts_by_status_with_items_and_accounts(self, status_ids):
+    def get_receipts_by_status_with_items_and_accounts(self, status_ids, limit):
         return self.get_current_session().query(Receipt) \
             .options(joinedload(Receipt.items).joinedload(Item.account)) \
-            .filter(Receipt.status_id.in_(status_ids)).all()
+            .filter(Receipt.status_id.in_(status_ids)) \
+            .order_by(Receipt.purchase_date.desc()).limit(limit).all()

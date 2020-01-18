@@ -42,7 +42,10 @@ def search_accounts():
     return app.search_accounts(config.args.search_text)
 
 def generate_transaction():
-    app.generate_transaction(config.args.output_file)
+    logger.debug('is_merge_transaction = %s', config.args.is_merge_transaction)
+    app.generate_transaction(config.args.output_file,
+                             config.args.is_merge_transaction,
+                             config.args.limit)
     config.args.output_file.close()
 
 def add_json():
@@ -122,15 +125,33 @@ def parse_arguments():
         'generate-transaction',
         aliases=['gt'],
         description='generate transaction')
-    generate_transaction_parser.add_argument('output_file',
-        type=argparse.FileType('w', encoding='UTF-8'), help='output file')
+    generate_transaction_parser.add_argument(
+        'output_file',
+        type=argparse.FileType('w', encoding='UTF-8'),
+        help='output file')
+    generate_transaction_parser.add_argument(
+        '-s',
+        help='Split transacton by item. Will be merged by account name by default',
+        action='store_false',
+        default=True,
+        dest='is_merge_transaction')
+    generate_transaction_parser.add_argument(
+        '-l',
+        '--limit',
+        metavar='int',
+        type=int,
+        help='Show number of recent receipts',
+        dest='limit')
     generate_transaction_parser.set_defaults(func=generate_transaction)
 
     # create the parser for the "add-receipt-json" command
-    parser_add_json = subparsers.add_parser('add-json',
-        aliases=['a'], description='Add new receipt\'s json')
+    parser_add_json = subparsers.add_parser(
+        'add-json',
+        aliases=['a'],
+        description='Add new receipt\'s json')
     parser_add_json.set_defaults(func=add_json)
-    parser_add_json.add_argument('json_file',
+    parser_add_json.add_argument(
+        'json_file',
         type=argparse.FileType('r', encoding='UTF-8'),
         help='receipt\'s json')
 

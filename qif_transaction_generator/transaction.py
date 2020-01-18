@@ -94,3 +94,22 @@ def convert(receipts):
         t = Transaction('test', r.purchase_date, r.total / ratio, None, accounts)
         result.append(t)
     return result
+
+def convert_with_merging_items(receipts):
+    logger.debug('start convert receipt to qif transaction with merging items')
+    result = []
+    for r in receipts:
+        accounts_dict = {}
+        accounts = []
+        for item in r.items:
+            if item.account.full_name in accounts_dict:
+                merge_account = accounts_dict[item.account.full_name]
+                merge_account.description = None
+                merge_account.amount = merge_account.amount + item.sum / ratio
+            else:
+                account = Account(item.account.full_name, None, item.sum / ratio)
+                accounts.append(account)
+                accounts_dict[item.account.full_name] = account
+        t = Transaction('test', r.purchase_date, r.total / ratio, None, accounts)
+        result.append(t)
+    return result

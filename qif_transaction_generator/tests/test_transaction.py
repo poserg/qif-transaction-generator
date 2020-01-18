@@ -9,7 +9,8 @@ import qif_transaction_generator.transaction as transaction
 
 class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
 
-    def positive_case(self):
+
+    def test_positive_case(self):
         a1 = models.Account(full_name='Account 1')
         i1 = models.Item(name='item 1', sum=100, account=a1)
         a2 = models.Account(full_name='Account 2')
@@ -27,12 +28,12 @@ class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
 
         self.assertEqual(len(result[0].accounts), 2)
         self.assertEqual(result[0].accounts[0].category, a1.full_name)
-        self.assertEqual(result[0].accounts[0].description, None)
-        self.assertEqual(result[0].accounts[0].amount, 100)
+        self.assertEqual(result[0].accounts[0].description, i1.name)
+        self.assertEqual(result[0].accounts[0].amount, 1)
 
         self.assertEqual(result[0].accounts[1].category, a2.full_name)
-        self.assertEqual(result[0].accounts[1].description, None)
-        self.assertEqual(result[0].accounts[1].amount, 200)
+        self.assertEqual(result[0].accounts[1].description, i2.name)
+        self.assertEqual(result[0].accounts[1].amount, 2)
 
     def test_with_empty_accounts(self):
         r = models.Receipt(id='receipt_1',
@@ -45,6 +46,45 @@ class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
         result = transaction.convert([])
 
         self.assertEqual(result, [])
+
+
+class TestConvertReceiptsToQIFTransactionWithMergeItems(unittest.TestCase):
+
+
+    def test_positive_case(self):
+        a1 = models.Account(full_name='Account 1')
+        i1 = models.Item(name='item 1', sum=100, account=a1)
+        a2 = models.Account(full_name='Account 2')
+        i2 = models.Item(name='item 2', sum=200, account=a2)
+        a3 = models.Account(full_name='Account 3')
+        i3 = models.Item(name='item 3', sum=300, account=a3)
+        i4 = models.Item(name='item 4', sum=400, account=a2)
+        i5 = models.Item(name='item 5', sum=500, account=a2)
+        i6 = models.Item(name='item 6', sum=600, account=a1)
+        r = models.Receipt(id='receipt_1',
+                           purchase_date='my date',
+                           total=302, items=[i1, i2, i3, i4, i5, i6])
+        result = transaction.convert_with_merging_items([r])
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].source, 'test')
+        self.assertEqual(result[0].date, 'my date')
+        self.assertEqual(result[0].amount, 3.02)
+        self.assertEqual(result[0].description, None)
+
+        self.assertEqual(len(result[0].accounts), 3)
+        self.assertEqual(result[0].accounts[0].category, a1.full_name)
+        self.assertEqual(result[0].accounts[0].description, None)
+        self.assertEqual(result[0].accounts[0].amount, 7)
+
+        self.assertEqual(result[0].accounts[1].category, a2.full_name)
+        self.assertEqual(result[0].accounts[1].description, None)
+        self.assertEqual(result[0].accounts[1].amount, 11)
+
+        self.assertEqual(result[0].accounts[2].category, a3.full_name)
+        self.assertEqual(result[0].accounts[2].description, None)
+        self.assertEqual(result[0].accounts[2].amount, 3)
+
 
 class TestDumpQIFTransaction(unittest.TestCase):
 

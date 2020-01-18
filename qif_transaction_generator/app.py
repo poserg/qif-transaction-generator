@@ -12,7 +12,8 @@ from qif_transaction_generator.models import Receipt, StatusEnum, \
 from qif_transaction_generator.gnucash import parse_accounts, \
     set_up_account_names, get_difference_list
 from qif_transaction_generator.enriching import enrich_receipt
-from qif_transaction_generator.transaction import convert
+from qif_transaction_generator.transaction import convert_with_merging_items, \
+    convert
 
 logger = logging.getLogger(__name__)
 
@@ -130,13 +131,16 @@ class App:
         else:
             logger.info('search result is empty')
 
-    def generate_transaction(self, output_file):
+    def generate_transaction(self, output_file, is_merge_transaction, limit):
         logger.debug('start generate transaction')
         receipts = self.db_util.get_receipts_by_status_with_items_and_accounts(
-            [StatusEnum.DONE.value])
+            [StatusEnum.DONE.value], limit)
         if receipts:
             logger.debug('Found %d receipt(s) with status DONE', len(receipts))
-            transactions = convert(receipts)
+            if is_merge_transaction:
+                transactions = convert_with_merging_items(receipts)
+            else:
+                transactions = convert(receipts)
             for t in transactions:
                 logger.debug('Write transaction {%s} to file', t)
                 output_file.write('\n'.join(t.dump()))
