@@ -80,7 +80,7 @@ class TestDumpQIFTransaction(unittest.TestCase):
         self.assertEqual(result[11], 'SРасходы:Телефон:My')
         self.assertEqual(result[12], 'Edescription for gloceries')
         self.assertEqual(result[13], '$-1500.00')
-        self.assertEqual(result[14], '^')
+        self.assertEqual(result[14], '^\n')
 
     def test_case_with_unite_transaction(self):
         a = transaction.Account(
@@ -106,7 +106,7 @@ class TestDumpQIFTransaction(unittest.TestCase):
         self.assertEqual(result[6], 'U-500.00')
         self.assertEqual(result[7], 'Pto my mobile phone')
         self.assertEqual(result[8], 'LExpenses:Phone')
-        self.assertEqual(result[9], '^')
+        self.assertEqual(result[9], '^\n')
 
     def test_split_transaction_without_description(self):
         a1 = transaction.Account(
@@ -139,7 +139,7 @@ class TestDumpQIFTransaction(unittest.TestCase):
         self.assertEqual(result[10], '$-1200.00')
         self.assertEqual(result[11], 'SРасходы:Телефон:My')
         self.assertEqual(result[12], '$-1500.00')
-        self.assertEqual(result[13], '^')
+        self.assertEqual(result[13], '^\n')
 
     def test_unite_transaction_without_description(self):
         a = transaction.Account(
@@ -164,4 +164,4 @@ class TestDumpQIFTransaction(unittest.TestCase):
         self.assertEqual(result[5], 'D08/08/2018')
         self.assertEqual(result[6], 'U-500.00')
         self.assertEqual(result[7], 'LExpenses:Phone')
-        self.assertEqual(result[8], '^')
+        self.assertEqual(result[8], '^\n')

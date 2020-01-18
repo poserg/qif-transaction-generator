@@ -82,7 +82,7 @@ class Transaction:
                 result.append('$' + '-%.2f' % account.amount)
 
         # End of the entry
-        result.append('^')
+        result.append('^\n')
 
         return result
 
@@ -90,7 +90,7 @@ def convert(receipts):
     logger.debug('start convert receipt to qif transaction')
     result = []
     for r in receipts:
-        accounts = [Account(item.account.full_name, None, item.sum / ratio) for item in r.items]
+        accounts = [Account(item.account.full_name, item.name, item.sum / ratio) for item in r.items]
         t = Transaction('test', r.purchase_date, r.total / ratio, None, accounts)
         result.append(t)
     return result
