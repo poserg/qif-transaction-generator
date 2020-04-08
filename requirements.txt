@@ -1,3 +1,4 @@
 requests
 git+git://github.com/poserg/revise-receipt-client
 alembic
+urwid
