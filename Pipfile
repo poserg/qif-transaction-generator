@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "*"
+alembic = "*"
+urwid = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
+
+[packages.fns]
+git = "git://github.com/poserg/revise-receipt-client.git"
