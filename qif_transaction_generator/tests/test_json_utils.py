@@ -1,5 +1,4 @@
 import unittest
-import unittest.mock as mock
 
 import datetime
 
@@ -74,7 +73,7 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
         self.assertEqual(r.ecash_total_sum, 1211)
         self.assertEqual(r.cash_total_sum, 3300)
         self.assertEqual(r.total_sum, 4511)
-        self.assertEqual(r.purchase_date, datetime.datetime(2019, 5, 9, 10, 4))
+        self.assertEqual(r.purchase_date, datetime.datetime.fromtimestamp(1557385440))
         self.assertEqual(len(r.items), 1)
         self.assertEqual(r.items[0].name, 'item_name')
         self.assertEqual(r.items[0].price, 20)
@@ -110,7 +109,7 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
         self.assertEqual(r.ecash_total_sum, 1211)
         self.assertEqual(r.cash_total_sum, 3300)
         self.assertEqual(r.total_sum, 4511)
-        self.assertEqual(r.purchase_date, datetime.datetime(2019, 5, 9, 10, 4))
+        self.assertEqual(r.purchase_date, datetime.datetime.fromtimestamp(1557385440))
         self.assertEqual(len(r.items), 2)
         self.assertEqual(r.items[0].name, 'item_name_1')
         self.assertEqual(r.items[0].price, 20)
