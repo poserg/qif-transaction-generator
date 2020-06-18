@@ -6,21 +6,16 @@ class RecordList(tk.Frame):
     From https://github.com/PacktPublishing/Python-GUI-Programming-with-Tkinter/blob/master/Chapter11/ABQ_Data_Entry/abq_data_entry/views.py
     """
 
-    column_defs = {
-        '#0': {'label': 'Row', 'anchor': tk.W},
-        'date': {'label': 'Date', 'width': 150, 'stretch': True},
-        'total': {'label': 'Total', 'width': 50},
-        'status': {'label': 'Status', 'width': 100}
-    }
     default_width = 100
     default_minwidth = 10
     default_anchor = tk.CENTER
 
-    def __init__(self, parent, callbacks,
+    def __init__(self, parent, callbacks, column_defs,
                  inserted, updated,
                  *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.callbacks = callbacks
+        self.column_defs = column_defs
         self.inserted = inserted
         self.updated = updated
         self.columnconfigure(0, weight=1)
@@ -81,6 +76,5 @@ class RecordList(tk.Frame):
             self.treeview.focus(firstrow)
 
     def on_open_record(self, *args):
-
         selected_id = self.treeview.selection()[0]
         self.callbacks['on_open_record'](selected_id.split('|'))

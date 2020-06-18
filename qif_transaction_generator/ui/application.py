@@ -38,16 +38,26 @@ class Application(tk.Tk):
         #if theme in style.theme_names():
         #    style.theme_use(theme)
         
-        self.callbacks = {}
+        self.callbacks = {
+            'on_open_record': self.open_record
+        }
         
         self.config = Config()
         self.config.dbpath = 'sqlite:///db_prod_copy.sqlite'
         self.db_util = DBUtil(self.config.dbpath)
 
+        column_defs = {
+            '#0': {'label': 'Row', 'anchor': tk.W},
+            'date': {'label': 'Date', 'width': 150, 'stretch': True},
+            'status': {'label': 'Status', 'width': 200},
+            'total': {'label': 'Total', 'width': 150, 'anchor': tk.E}
+        }
+
         # The data record list
         self.recordlist = v.RecordList(
             self,
             self.callbacks,
+            column_defs,
             inserted=self.inserted_rows,
             updated=self.updated_rows
         )
@@ -55,9 +65,14 @@ class Application(tk.Tk):
         self.populate_recordlist()
 
     def populate_recordlist(self):
-        receipts = self.db_util.get_receipts_by_status_with_items_and_accounts([db_m.StatusEnum.DONE.value], 10)
+        receipts = self.db_util.get_receipts_by_status_with_items_and_accounts(
+            [db_m.StatusEnum.DONE.value, db_m.StatusEnum.CREATED_FROM_FILE.value], 100)
         rows = []
         for r in receipts:
-            rows.append({'date': r.purchase_date, 'status': r.status.code, 'total': r.total})
+            d = {'date': r.purchase_date, 'status': r.status.code}
+            d['total'] = '%.2f' % (r.total/100.0) if r.total else r.total
+            rows.append(d)
         self.recordlist.populate(rows)
         
+    def open_record(self, rowkey):
+        print(rowkey)
