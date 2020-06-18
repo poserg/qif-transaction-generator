@@ -1,8 +1,7 @@
 import logging
 
-from qif_transaction_generator.json_utils import from_string_to_json, \
-    parse_receipt
-from qif_transaction_generator.models import StatusEnum
+from . json_utils import from_string_to_json, parse_receipt
+from . models import StatusEnum
 
 logger = logging.getLogger(__name__)
 

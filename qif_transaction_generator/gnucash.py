@@ -1,7 +1,7 @@
 import logging
 import xml.etree.ElementTree as ET
 
-from qif_transaction_generator.models import Account, AccountTypeEnum
+from . models import Account, AccountTypeEnum
 
 logger = logging.getLogger(__name__)
 

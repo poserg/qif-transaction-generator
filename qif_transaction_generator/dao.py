@@ -5,8 +5,7 @@ import logging
 from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker, joinedload
 
-from qif_transaction_generator.models import Receipt, Dictionary, Item, \
-    Account, FnsReceipt
+from . models import Receipt, Dictionary, Item, Account, FnsReceipt
 
 logger = logging.getLogger(__name__)
 

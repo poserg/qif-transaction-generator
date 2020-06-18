@@ -2,7 +2,7 @@ import json as j
 import datetime
 import logging
 
-from qif_transaction_generator.models import Item, Receipt
+from . models import Item, Receipt
 
 logger = logging.getLogger(__name__)
 

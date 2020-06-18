@@ -4,16 +4,13 @@ import dateutil.parser
 import logging
 
 from fns import check_receipt, revise_info
-from qif_transaction_generator.dao import DBUtil
-from qif_transaction_generator.config import Config
-from qif_transaction_generator.models import Receipt, StatusEnum, \
-    Dictionary, FnsReceipt
+from . dao import DBUtil
+from . config import Config
+from . models import Receipt, StatusEnum, Dictionary, FnsReceipt
 
-from qif_transaction_generator.gnucash import parse_accounts, \
-    set_up_account_names, get_difference_list
-from qif_transaction_generator.enriching import enrich_receipt
-from qif_transaction_generator.transaction import convert_with_merging_items, \
-    convert
+from . gnucash import parse_accounts, set_up_account_names, get_difference_list
+from . enriching import enrich_receipt
+from . transaction import convert_with_merging_items, convert
 
 logger = logging.getLogger(__name__)
 
