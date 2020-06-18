@@ -111,4 +111,6 @@ venv.bak/
 
 # Pydev project settings
 .project
+.settings
 .pydevproject
+tmp
