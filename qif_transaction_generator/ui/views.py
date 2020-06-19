@@ -57,6 +57,8 @@ class RecordList(tk.Frame):
 
         # Bind double-clicks
         self.treeview.bind('<<TreeviewOpen>>', self.on_open_record)
+        
+        self.rows = []
 
     def populate(self, rows):
         """Clear the treeview and write the supplied data rows to it."""
@@ -74,7 +76,9 @@ class RecordList(tk.Frame):
             self.treeview.focus_set()
             self.treeview.selection_set(firstrow)
             self.treeview.focus(firstrow)
+        self.rows = rows
 
     def on_open_record(self, *args):
         selected_id = self.treeview.selection()[0]
-        self.callbacks['on_open_record'](selected_id.split('|'))
+        # self.callbacks['on_open_record'](selected_id.split('|'))
+        self.callbacks['on_open_record'](self.rows[int(selected_id)])

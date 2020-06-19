@@ -104,3 +104,8 @@ class DBUtil:
             .options(joinedload(Receipt.items).joinedload(Item.account)) \
             .filter(Receipt.status_id.in_(status_ids)) \
             .order_by(Receipt.purchase_date.desc()).limit(limit).all()
+
+    def get_items_by_receipt_id(self, receipt_id):
+        return self.get_current_session().query(Item) \
+            .options(joinedload(Item.account)) \
+            .filter(Item.receipt_id == receipt_id).all()
