@@ -6,6 +6,7 @@ from qif_transaction_generator.models import StatusEnum
 
 logger = logging.getLogger(__name__)
 
+
 def enrich_receipt(db_util, receipt_id):
     assert db_util
     assert receipt_id
@@ -38,7 +39,7 @@ def enrich_receipt(db_util, receipt_id):
 
 def _enrich_receipt_items_from_json(receipt):
     logger.debug('start enrich receipt items from json for %s', receipt.id)
-    #assert receipt.items is None or len(
+    # assert receipt.items is None or len(
     #    receipt.items) == 0, 'items must be empty'
 
     try:
@@ -53,7 +54,7 @@ def _enrich_receipt_items_from_json(receipt):
         except Exception as e:
             logger.exception(
                 'Couldn\'t parse json. It\'s a wrong format: %s, %s',
-                 e, json)
+                e, json)
     except Exception as e:
         logger.exception('Couldn\'t convert raw to json. %s', receipt.raw)
 
