@@ -2,11 +2,14 @@ import platform
 from os import environ
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 from . import views as v
 from . import models as m
 from .. config import Config
 from .. import models as db_m
 from .. dao import DBUtil
+from qif_transaction_generator.app import App
+
 
 class Application(tk.Tk):
     """Application root window."""
@@ -52,6 +55,14 @@ class Application(tk.Tk):
             updated=self.updated_rows)
         self.itemlist.grid(row=2, padx=10, sticky='NSEW')
 
+    def _build_add_button(self):
+        self.addbutton = ttk.Button(
+            self,
+            text='Add',
+            command=self.callbacks["on_add_record"]
+        )
+        self.addbutton.grid(row=0, padx=10, sticky="W")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -74,7 +85,8 @@ class Application(tk.Tk):
         #    style.theme_use(theme)
 
         self.callbacks = {
-            'on_open_record': self.open_receipt
+            'on_open_record': self._open_receipt,
+            'on_add_record': self._add_receipt
         }
 
         self.config = Config()
@@ -83,7 +95,10 @@ class Application(tk.Tk):
 
         self._build_add_button()
         self._build_receiptlist()
+        self._build_itemlist()
 
+        self.app = App()
+        self.app.init()
 
     def _convert_int_to_money_str(self, value):
         return '%.2f' % (value / 100.0) if value else value
@@ -117,3 +132,16 @@ class Application(tk.Tk):
 
     def _open_item(self, row):
         print ('item = %s' % row)
+
+    def _add_receipt(self):
+        filenames = filedialog.askopenfilenames(
+            title='Select source files',
+            initialdir="~/",
+            filetypes=(("JSON files", ".json"), ("All files", "*.*"))
+        )
+
+        for filename in filenames:
+            with open(filename, 'r', encoding='UTF-8') as file:
+                id = self.app.add_json(file)
+        self.app.enrich_receipts()
+        self._populate_receiptlist()
