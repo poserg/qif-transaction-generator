@@ -2,6 +2,7 @@ import logging
 import tkinter as tk
 from tkinter import ttk
 from tkinter.simpledialog import Dialog
+from . import widgets as w
 
 logger = logging.getLogger(__name__)
 
@@ -99,18 +100,23 @@ class AccountChooseDialog(Dialog):
 
     def body(self, parent):
         lf = tk.Frame(self)
-        ttk.Label(lf, text='Login to ABQ', font='Sans 20').grid()
-        self.treeview = ttk.Treeview(
+        # ttk.Label(lf, text='Login to ABQ', font='Sans 20').grid()
+        self.treeview = w.SearchableTreeview(
             lf,
             # columns=list(column_defs.keys())[1:],
             selectmode='browse'
         )
         # valuekeys = list(column_defs.keys())[1:]
-        for rownum, rowdata in enumerate(self.accounts):
+        for rowdata in self.accounts:
             # values = [rowdata[key] for key in valuekeys]
             self.treeview.insert(rowdata['parent_guid'], 'end',
                                  iid=rowdata['guid'],
                                  text=str(rowdata['name']))
+        if len(self.accounts) > 0:
+            firstrow = self.treeview.identify_row(0)
+            self.treeview.focus_set()
+            self.treeview.selection_set(firstrow)
+            self.treeview.focus(firstrow)
         self.treeview.grid()
         lf.pack()
         return

@@ -147,9 +147,9 @@ class Application(tk.Tk):
         self.itemlist.populate(rows)
 
     def _open_item(self, row):
+        logger.debug('selected item = %s', row)
         account = v.AccountChooseDialog(self, 'Choose the account',
                                         self.accounts)
-        logger.debug('selected item = %s', row)
 
     def _add_receipt(self):
         filenames = filedialog.askopenfilenames(
