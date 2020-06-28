@@ -1,3 +1,4 @@
+import logging
 import platform
 from os import environ
 import tkinter as tk
@@ -10,6 +11,7 @@ from .. import models as db_m
 from .. dao import DBUtil
 from qif_transaction_generator.app import App
 
+logger = logging.getLogger(__name__)
 
 class Application(tk.Tk):
     """Application root window."""
@@ -63,6 +65,18 @@ class Application(tk.Tk):
         )
         self.addbutton.grid(row=0, padx=10, sticky="W")
 
+    def _process_accounts(self):
+        accounts = self.db_util.get_all_accounts()
+        rows = []
+        for item in accounts:
+            d = {
+                'guid': item.guid,
+                'name': item.name,
+                'parent_guid': item.parent_guid if item.parent_guid else ''
+            }
+            rows.append(d)
+        self.accounts = rows
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -96,6 +110,7 @@ class Application(tk.Tk):
         self._build_add_button()
         self._build_receiptlist()
         self._build_itemlist()
+        self._process_accounts()
 
         self.app = App()
         self.app.init()
@@ -126,12 +141,15 @@ class Application(tk.Tk):
                  'quantity': i.quantity,
                  'sum': self._convert_int_to_money_str(i.sum),
                  'account':
-                 i.account.full_name if i.account else i.account_guid}
+                 i.account.full_name if i.account else i.account_guid,
+                 'account_guid': i.account_guid}
             rows.append(d)
         self.itemlist.populate(rows)
 
     def _open_item(self, row):
-        print ('item = %s' % row)
+        account = v.AccountChooseDialog(self, 'Choose the account',
+                                        self.accounts)
+        logger.debug('selected item = %s', row)
 
     def _add_receipt(self):
         filenames = filedialog.askopenfilenames(

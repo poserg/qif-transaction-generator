@@ -1,8 +1,13 @@
+import logging
 import tkinter as tk
 from tkinter import ttk
+from tkinter.simpledialog import Dialog
+
+logger = logging.getLogger(__name__)
 
 class RecordList(tk.Frame):
-    """Display for CSV file contents 
+    """Display for CSV file contents.
+
     From https://github.com/PacktPublishing/Python-GUI-Programming-with-Tkinter/blob/master/Chapter11/ABQ_Data_Entry/abq_data_entry/views.py
     """
 
@@ -57,19 +62,19 @@ class RecordList(tk.Frame):
 
         # Bind double-clicks
         self.treeview.bind('<<TreeviewOpen>>', self.on_open_record)
-        
+
         self.rows = []
 
     def populate(self, rows):
         """Clear the treeview and write the supplied data rows to it."""
-
         for row in self.treeview.get_children():
             self.treeview.delete(row)
 
         valuekeys = list(self.column_defs.keys())[1:]
         for rownum, rowdata in enumerate(rows):
             values = [rowdata[key] for key in valuekeys]
-            self.treeview.insert('', 'end', iid=str(rownum), text=str(rownum), values=values)
+            self.treeview.insert('', 'end', iid=str(rownum),
+                                 text=str(rownum), values=values)
 
         if len(rows) > 0:
             firstrow = self.treeview.identify_row(0)
@@ -82,3 +87,30 @@ class RecordList(tk.Frame):
         selected_id = self.treeview.selection()[0]
         # self.callbacks['on_open_record'](selected_id.split('|'))
         self.callbacks['on_open_record'](self.rows[int(selected_id)])
+
+
+class AccountChooseDialog(Dialog):
+    """The form to choose account."""
+
+    def __init__(self, parent, title, accounts):
+        self.to_search = tk.StringVar()
+        self.accounts = accounts
+        super().__init__(parent, title=title)
+
+    def body(self, parent):
+        lf = tk.Frame(self)
+        ttk.Label(lf, text='Login to ABQ', font='Sans 20').grid()
+        self.treeview = ttk.Treeview(
+            lf,
+            # columns=list(column_defs.keys())[1:],
+            selectmode='browse'
+        )
+        # valuekeys = list(column_defs.keys())[1:]
+        for rownum, rowdata in enumerate(self.accounts):
+            # values = [rowdata[key] for key in valuekeys]
+            self.treeview.insert(rowdata['parent_guid'], 'end',
+                                 iid=rowdata['guid'],
+                                 text=str(rowdata['name']))
+        self.treeview.grid()
+        lf.pack()
+        return
