@@ -7,11 +7,12 @@ name = "pypi"
 requests = "*"
 alembic = "*"
 urwid = "*"
+python-dateutil = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [packages.fns]
-git = "git://github.com/poserg/revise-receipt-client.git"
+git = "https://github.com/poserg/revise-receipt-client.git"
