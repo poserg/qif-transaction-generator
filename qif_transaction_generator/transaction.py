@@ -102,6 +102,9 @@ def convert_with_merging_items(receipts):
         accounts_dict = {}
         accounts = []
         for item in r.items:
+            if item.sum == 0:
+                logger.debug(f"Skip free item '{item.name}'")
+                continue
             if item.account.full_name in accounts_dict:
                 merge_account = accounts_dict[item.account.full_name]
                 merge_account.description = None

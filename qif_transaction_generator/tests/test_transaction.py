@@ -85,6 +85,34 @@ class TestConvertReceiptsToQIFTransactionWithMergeItems(unittest.TestCase):
         self.assertEqual(result[0].accounts[2].description, None)
         self.assertEqual(result[0].accounts[2].amount, 3)
 
+    def test_convert_with_merging_items_with_skipping_free_items(self):
+        a1 = models.Account(full_name='Account 1')
+        i1 = models.Item(name='item 1', sum=100, account=a1)
+        a2 = models.Account(full_name='Account 2')
+        i2 = models.Item(name='item 2', sum=200, account=a2)
+        a3 = models.Account(full_name='Account 3')
+        i3 = models.Item(name='item 3', sum=0, account=a3)
+        i4 = models.Item(name='item 4', sum=0, account=a2)
+        r = models.Receipt(id='receipt_1',
+                           purchase_date='my date',
+                           total=302, items=[i1, i2, i3, i4])
+        result = transaction.convert_with_merging_items([r])
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].source, 'test')
+        self.assertEqual(result[0].date, 'my date')
+        self.assertEqual(result[0].amount, 3.02)
+        self.assertEqual(result[0].description, None)
+
+        self.assertEqual(len(result[0].accounts), 2)
+        self.assertEqual(result[0].accounts[0].category, a1.full_name)
+        self.assertEqual(result[0].accounts[0].description, None)
+        self.assertEqual(result[0].accounts[0].amount, 1)
+
+        self.assertEqual(result[0].accounts[1].category, a2.full_name)
+        self.assertEqual(result[0].accounts[1].description, None)
+        self.assertEqual(result[0].accounts[1].amount, 2)
+
 
 class TestDumpQIFTransaction(unittest.TestCase):
 
