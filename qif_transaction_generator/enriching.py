@@ -65,6 +65,9 @@ def _bind_items_to_categories(db_util, receipt):
         if item.account_guid:
             logger.debug('item\'s had being bound \'%s\'', item.account_guid)
             continue
+        if item.price == 0:
+            logger.debug('item is free')
+            continue
         phrases = _get_phrases(item.name)
         logger.debug('phrases: %s', phrases)
         d = db_util.get_dictionaries_by_phrases(phrases)

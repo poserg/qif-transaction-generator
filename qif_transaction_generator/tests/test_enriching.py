@@ -248,6 +248,22 @@ class TestBindingItems(unittest.TestCase):
         self.assertEqual(item1.account_guid, 'test_guid1')
         self.assertListEqual(result, [item2])
 
+    @mock.patch('qif_transaction_generator.enriching._get_phrases')
+    def test_bind_free_items(self, mock_get_phrases):
+        mock_get_phrases.return_value = 'test_phrase'
+        d1 = Dictionary(account_guid='test_guid1', weight=2)
+        d2 = Dictionary(account_guid='test_guid2', weight=5)
+        self.db_util.get_dictionaries_by_phrases.side_effect = [[d1, d2], []]
+
+        r = Receipt()
+        item1 = Item(name='item with exist phrase')
+        item2 = Item(name='item wasn\'t existed')
+        item2.price = 0
+        r.items = [item1, item2]
+        result = _bind_items_to_categories(self.db_util, r)
+
+        self.assertListEqual(result, [])
+
 
 class TestGePhrases(unittest.TestCase):
 
