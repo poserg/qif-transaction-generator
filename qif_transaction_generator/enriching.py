@@ -5,6 +5,7 @@ from . models import StatusEnum
 
 logger = logging.getLogger(__name__)
 
+
 def enrich_receipt(db_util, receipt_id):
     assert db_util
     assert receipt_id
@@ -17,17 +18,18 @@ def enrich_receipt(db_util, receipt_id):
         else:
             if not receipt.items or len(receipt.items) == 0:
                 _enrich_receipt_items_from_json(receipt)
-            if receipt.items and len(receipt.items) > 0:
-                undefined_items = _bind_items_to_categories(
-                    db_util, receipt)
-                if len(undefined_items) == 0:
-                    logger.info(
-                        'all items were found for receipt(%d)',
-                        receipt.id)
-                    receipt.status_id = StatusEnum.DONE.value
-                    session.commit()
-            else:
+            if not receipt.items or len(receipt.items) == 0:
                 logger.warning('receipt doesn\'t have any items')
+                return
+
+            undefined_items = _bind_items_to_categories(
+                db_util, receipt)
+            if len(undefined_items) == 0:
+                logger.info(
+                    'all items were found for receipt(%d)',
+                    receipt.id)
+                receipt.status_id = StatusEnum.DONE.value
+                session.commit()
     except Exception as e:
         session.rollback()
         raise e
@@ -37,7 +39,7 @@ def enrich_receipt(db_util, receipt_id):
 
 def _enrich_receipt_items_from_json(receipt):
     logger.debug('start enrich receipt items from json for %s', receipt.id)
-    #assert receipt.items is None or len(
+    # assert receipt.items is None or len(
     #    receipt.items) == 0, 'items must be empty'
 
     try:
@@ -52,9 +54,10 @@ def _enrich_receipt_items_from_json(receipt):
         except Exception as e:
             logger.exception(
                 'Couldn\'t parse json. It\'s a wrong format: %s, %s',
-                 e, json)
+                e, json)
     except Exception as e:
-        logger.exception('Couldn\'t convert raw to json. %s', receipt.raw)
+        logger.exception(
+            'Couldn\'t convert raw to json. %s : %s', e, receipt.raw)
 
 
 def _bind_items_to_categories(db_util, receipt):
@@ -78,7 +81,8 @@ def _bind_items_to_categories(db_util, receipt):
             d[0].weight = d[0].weight + 1
             logger.debug('set weight %d for dictionary %s', d[0].weight, d[0])
         else:
-            logger.warning('dictionaries weren\'t found for item: %s', item.name)
+            logger.warning(
+                'dictionaries weren\'t found for item: %s', item.name)
             undefined_items.append(item)
 
     logger.debug('finish bind_items_to_categories')

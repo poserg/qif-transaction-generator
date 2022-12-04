@@ -4,7 +4,8 @@ import unittest.mock as mock
 from qif_transaction_generator.enriching import enrich_receipt,\
     _enrich_receipt_items_from_json, _bind_items_to_categories, \
     _get_phrases
-from qif_transaction_generator.models import Item, Receipt, Dictionary
+from qif_transaction_generator.models import Item, Receipt, Dictionary, \
+    StatusEnum
 
 
 @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
@@ -21,7 +22,7 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
         test_receipt = Receipt()
         test_receipt.ecash_total_sum = 2
         test_receipt.cash_total_sum = 30
-        test_receipt.total_sum=32
+        test_receipt.total_sum = 32
         test_receipt.purchase_date = 'my_date'
         test_receipt.items = [
             Item(name='item_name', price=13, quantity=10, sum=130)
@@ -77,6 +78,7 @@ class TestEnrichingItemsFromJson(unittest.TestCase):
         self.assertTrue(
             r.items is None or isinstance(r.items, list) and len(r.items) == 0)
 
+
 class TestEnrichingReceipts(unittest.TestCase):
 
     def setUp(self):
@@ -98,8 +100,8 @@ class TestEnrichingReceipts(unittest.TestCase):
 
     @mock.patch('qif_transaction_generator.enriching._enrich_receipt_items_from_json')
     @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
-    def test_enrich_one_receipt(self, mock_bind_items_to_categories, \
-            mock_enrich_receipt_items_from_json):
+    def test_enrich_one_receipt(self, mock_bind_items_to_categories,
+                                mock_enrich_receipt_items_from_json):
         r = Receipt(id='test_id', raw='test_raw')
         r.items = [Item()]
         self.db_util.get_receipt_by_id.return_value = [r]
@@ -118,8 +120,8 @@ class TestEnrichingReceipts(unittest.TestCase):
     @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
     @mock.patch('qif_transaction_generator.enriching.parse_receipt')
     @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
-    def test_enrich_receipt_without_items(self, mock_bind_items_to_categories, \
-            mock_parse_receipt, mock_from_string_to_json):
+    def test_enrich_receipt_without_items(self, mock_bind_items_to_categories,
+                                          mock_parse_receipt, mock_from_string_to_json):
         r = Receipt(id='test_id', raw='test_raw')
         self.db_util.get_receipt_by_id.return_value = [r]
         mock_parse_receipt.return_value.items = [Item()]
@@ -139,8 +141,8 @@ class TestEnrichingReceipts(unittest.TestCase):
     @mock.patch('qif_transaction_generator.enriching.from_string_to_json')
     @mock.patch('qif_transaction_generator.enriching.parse_receipt')
     @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
-    def test_enrich_without_items_after_parsing(self, mock_bind_items_to_categories, \
-            mock_parse_receipt, mock_from_string_to_json):
+    def test_enrich_without_items_after_parsing(self, mock_bind_items_to_categories,
+                                                mock_parse_receipt, mock_from_string_to_json):
         r = Receipt(id='test_id', raw='test_raw', status_id=4)
         self.db_util.get_receipt_by_id.return_value = [r]
         mock_parse_receipt.return_value.items = []
@@ -159,9 +161,9 @@ class TestEnrichingReceipts(unittest.TestCase):
 
     @mock.patch('qif_transaction_generator.enriching._enrich_receipt_items_from_json')
     @mock.patch('qif_transaction_generator.enriching._bind_items_to_categories')
-    def test_enrich_receipt_with_undefined_items(self, \
-            mock_bind_items_to_categories, \
-            mock_enrich_receipt_items_from_json):
+    def test_enrich_receipt_with_undefined_items(self,
+                                                 mock_bind_items_to_categories,
+                                                 mock_enrich_receipt_items_from_json):
         r = Receipt(id='test_id', raw='test_raw', status_id=4)
         item1 = Item()
         item2 = Item()
@@ -181,7 +183,8 @@ class TestEnrichingReceipts(unittest.TestCase):
         self.assertEqual(r.status_id, 4)
 
     def test_enrich_with_rollback(self):
-        self.db_util.get_receipt_by_id.side_effect = Exception('test_exception')
+        self.db_util.get_receipt_by_id.side_effect = Exception(
+            'test_exception')
 
         with self.assertRaises(Exception) as context:
             enrich_receipt(self.db_util, 5)
@@ -189,6 +192,7 @@ class TestEnrichingReceipts(unittest.TestCase):
         self.session.commit.assert_not_called()
         self.session.rollback.assert_called_once()
         self.session.close.assert_called_once()
+
 
 class TestBindingItems(unittest.TestCase):
 
