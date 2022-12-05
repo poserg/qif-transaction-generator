@@ -7,8 +7,6 @@ Create Date: 2019-01-15 07:18:15.830561
 """
 from alembic import op
 from sqlalchemy.orm.session import Session
-from sys import path as sys_path
-sys_path.append('./')
 from qif_transaction_generator.models import Status, StatusEnum
 
 
