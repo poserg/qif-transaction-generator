@@ -42,7 +42,7 @@ class App:
         try:
             self._process_revise_receipt(session)
             session.commit()
-        except:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -97,7 +97,7 @@ class App:
                         fns_receipt_id=fns_r.id,
                         raw=str(info.json()))
                     session.add(r)
-                except:
+                except Exception:
                     logger.warning('info isn\'t a json')
                     fns_r.status_id = StatusEnum.NOT_FOUND.value
             else:

@@ -48,7 +48,7 @@ class FnsReceipt(Base):
 
     def __repr__(self):
         return "<Receipt(id = %s fn = %s fp = %s fd = %s purchase_date = '%s', total = %s, status = %s)>" % (
-                self.id,
+            self.id,
             self.fn,
             self.fp,
             self.fd,
@@ -107,7 +107,8 @@ class Dictionary(Base):
     __tablename__ = 'dictionaries'
 
     id = Column(BigInteger, primary_key=True)
-    account_guid = Column(String(32), ForeignKey('accounts.guid'), nullable=False)
+    account_guid = Column(String(32), ForeignKey(
+        'accounts.guid'), nullable=False)
     phrase = Column(String, nullable=False)
     weight = Column(Integer, nullable=False)
 
@@ -152,8 +153,8 @@ class Account(Base):
     def __repr__(self):
         return "<%s(guid = %s, name = %s, type = , parent_guid = %s, full_name = %s>" % (
             self.__tablename__, self.guid, self.name,
-            #self.account_type_id
-            #if self.type is None else self.type.value,
+            # self.account_type_id
+            # if self.type is None else self.type.value,
             self.parent_guid,
             self.full_name)
 

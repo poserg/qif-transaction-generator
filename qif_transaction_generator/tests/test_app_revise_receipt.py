@@ -4,8 +4,7 @@ import unittest.mock as mock
 from qif_transaction_generator.app import App
 from qif_transaction_generator.config import Config
 from qif_transaction_generator.dao import DBUtil
-from qif_transaction_generator.models import FnsReceipt, StatusEnum,\
-    Receipt
+from qif_transaction_generator.models import FnsReceipt, StatusEnum
 
 
 class TestAppProcessReviseReceipt(unittest.TestCase):

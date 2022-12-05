@@ -1,4 +1,5 @@
 from __future__ import with_statement
+from qif_transaction_generator import models
 from alembic import context
 from sqlalchemy import create_engine
 from logging.config import fileConfig
@@ -15,7 +16,6 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from qif_transaction_generator import models
 target_metadata = models.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -23,10 +23,12 @@ target_metadata = models.Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+
 def get_url():
     url = context.get_x_argument(as_dictionary=True).get('url')
     assert url, "Database URL must be specified on command line with -x url=<DB_URL>"
     return url
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -40,7 +42,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url =get_url()
+    url = get_url()
     context.configure(
         url=url, target_metadata=target_metadata, literal_binds=True)
 
@@ -65,6 +67,7 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

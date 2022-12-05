@@ -40,6 +40,7 @@ class TestGnucash(unittest.TestCase):
         self.assertEqual(o1.parent_guid, o2.parent_guid)
         self.assertEqual(o1.account_type_id, o2.account_type_id)
 
+
 class TestSetUpAccountNames(unittest.TestCase):
 
     def test_set_up_account_names(self):
@@ -67,10 +68,10 @@ class TestSetUpAccountNames(unittest.TestCase):
             parent_guid='income_guid')
 
         accounts = [sub_income, root, income, sub_income2]
-        print (accounts)
+        print(accounts)
         set_up_account_names(accounts)
 
-        print (accounts)
+        print(accounts)
         self.assertTrue(accounts[0].equals(Account(
             guid='sub_income_guid',
             full_name='Income:Sub Income',

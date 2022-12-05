@@ -92,8 +92,8 @@ class DBUtil:
 
     def delete_all(self, list):
         session = self.get_current_session()
-        for l in list:
-            session.delete(l)
+        for record in list:
+            session.delete(record)
 
     def commit_current_sesssion(self):
         self.get_current_session().commit()

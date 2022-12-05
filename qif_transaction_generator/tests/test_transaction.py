@@ -7,8 +7,8 @@ import datetime
 import qif_transaction_generator.models as models
 import qif_transaction_generator.transaction as transaction
 
-class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
 
+class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
 
     def test_positive_case(self):
         a1 = models.Account(full_name='Account 1')
@@ -37,8 +37,8 @@ class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
 
     def test_with_empty_accounts(self):
         r = models.Receipt(id='receipt_1',
-                   purchase_date='my date',
-                   total=305, items=[])
+                           purchase_date='my date',
+                           total=305, items=[])
 
         self.assertRaises(AssertionError, transaction.convert, [r])
 
@@ -49,7 +49,6 @@ class TestConvertReceiptsToQIFTransaction(unittest.TestCase):
 
 
 class TestConvertReceiptsToQIFTransactionWithMergeItems(unittest.TestCase):
-
 
     def test_positive_case(self):
         a1 = models.Account(full_name='Account 1')
@@ -135,14 +134,16 @@ class TestDumpQIFTransaction(unittest.TestCase):
 
         self.assertEqual(len(result), 15)
         self.assertEqual(result[0], '!Account')
-        self.assertEqual(result[1], 'NАктивы:Текущие активы:Оборотный капитал:Alfa card')
+        self.assertEqual(
+            result[1], 'NАктивы:Текущие активы:Оборотный капитал:Alfa card')
         self.assertEqual(result[2], 'TCash')
         self.assertEqual(result[3], '^')
         self.assertEqual(result[4], '!Type:Cash')
         self.assertEqual(result[5], 'D02/20/2019')
         self.assertEqual(result[6], 'U-2700.00')
         self.assertEqual(result[7], 'PMy main description')
-        self.assertEqual(result[8], 'SРасходы:Питание:дома:Продукты:Молочные продукты:Йогурт')
+        self.assertEqual(
+            result[8], 'SРасходы:Питание:дома:Продукты:Молочные продукты:Йогурт')
         self.assertEqual(result[9], 'Edescription for dinning')
         self.assertEqual(result[10], '$-1200.00')
         self.assertEqual(result[11], 'SРасходы:Телефон:My')
@@ -195,14 +196,16 @@ class TestDumpQIFTransaction(unittest.TestCase):
 
         self.assertEqual(len(result), 14)
         self.assertEqual(result[0], '!Account')
-        self.assertEqual(result[1], 'NАктивы:Текущие активы:Оборотный капитал:Alfa card')
+        self.assertEqual(
+            result[1], 'NАктивы:Текущие активы:Оборотный капитал:Alfa card')
         self.assertEqual(result[2], 'TCash')
         self.assertEqual(result[3], '^')
         self.assertEqual(result[4], '!Type:Cash')
         self.assertEqual(result[5], 'D02/20/2019')
         self.assertEqual(result[6], 'U-2700.00')
         self.assertEqual(result[7], 'PMy main description')
-        self.assertEqual(result[8], 'SРасходы:Питание:дома:Продукты:Молочные продукты:Йогурт')
+        self.assertEqual(
+            result[8], 'SРасходы:Питание:дома:Продукты:Молочные продукты:Йогурт')
         self.assertEqual(result[9], 'Edescription for dinning')
         self.assertEqual(result[10], '$-1200.00')
         self.assertEqual(result[11], 'SРасходы:Телефон:My')

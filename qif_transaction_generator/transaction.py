@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)
 
 ratio = 100
 
+
 class Account:
 
     def __init__(self, category, description, amount):
@@ -14,10 +15,11 @@ class Account:
 
     def __str__(self):
         return '<Account %s, %2.f, %s>' % (
-                self.category,
-                self.amount,
-                self.description
-            )
+            self.category,
+            self.amount,
+            self.description
+        )
+
 
 class Transaction:
 
@@ -31,7 +33,7 @@ class Transaction:
         self.accounts = accounts
 
     def __str__(self):
-        return '<Transaction %s, %s, %s, %s>'% (
+        return '<Transaction %s, %s, %s, %s>' % (
             self.date,
             self.amount,
             self.description,
@@ -86,14 +88,18 @@ class Transaction:
 
         return result
 
+
 def convert(receipts):
     logger.debug('start convert receipt to qif transaction')
     result = []
     for r in receipts:
-        accounts = [Account(item.account.full_name, item.name, item.sum / ratio) for item in r.items]
-        t = Transaction('test', r.purchase_date, r.total / ratio, None, accounts)
+        accounts = [Account(item.account.full_name, item.name,
+                            item.sum / ratio) for item in r.items]
+        t = Transaction('test', r.purchase_date,
+                        r.total / ratio, None, accounts)
         result.append(t)
     return result
+
 
 def convert_with_merging_items(receipts):
     logger.debug('start convert receipt to qif transaction with merging items')
@@ -110,9 +116,11 @@ def convert_with_merging_items(receipts):
                 merge_account.description = None
                 merge_account.amount = merge_account.amount + item.sum / ratio
             else:
-                account = Account(item.account.full_name, None, item.sum / ratio)
+                account = Account(item.account.full_name,
+                                  None, item.sum / ratio)
                 accounts.append(account)
                 accounts_dict[item.account.full_name] = account
-        t = Transaction('test', r.purchase_date, r.total / ratio, None, accounts)
+        t = Transaction('test', r.purchase_date,
+                        r.total / ratio, None, accounts)
         result.append(t)
     return result
