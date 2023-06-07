@@ -25,6 +25,14 @@ class TestJsonUtilsFromStringToJson(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result['test_attribute'], 'test_value')
 
+    def test_parse_list(self):
+        test_string = "[{\"test_attribute\":\"test_value\"}]"
+        result = from_string_to_json(test_string)
+
+        self.assertIsInstance(result, dict)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result['test_attribute'], 'test_value')
+
 
 class TestJsonUtilsParseReceipt(unittest.TestCase):
 
@@ -119,3 +127,60 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
         self.assertEqual(r.items[1].price, 10)
         self.assertEqual(r.items[1].quantity, 33)
         self.assertEqual(r.items[1].sum, 330)
+
+    def test_parse_ticket(self):
+        s = {
+            'ticket': {
+                'document': {
+                    'receipt': {
+                        'ecashTotalSum': 1211,
+                        'cashTotalSum': 3300,
+                        'items': [{
+                            'name': 'item_name_1',
+                            'price': 20,
+                            'quantity': 31,
+                            'sum': 620
+                        }, {
+                            'name': 'item_name_2',
+                            'price': 10,
+                            'quantity': 33,
+                            'sum': 330
+                        }],
+                        'totalSum': 4511,
+                        'dateTime': 1557385440
+                    }
+                }
+            }
+        }
+        r = parse_receipt(s)
+
+        self.assertEqual(r.ecash_total_sum, 1211)
+
+    def test_parse_datetime_as_date_format(self):
+        s = {
+            'ticket': {
+                'document': {
+                    'receipt': {
+                        'ecashTotalSum': 1211,
+                        'cashTotalSum': 3300,
+                        'items': [{
+                            'name': 'item_name_1',
+                            'price': 20,
+                            'quantity': 31,
+                            'sum': 620
+                        }, {
+                            'name': 'item_name_2',
+                            'price': 10,
+                            'quantity': 33,
+                            'sum': 330
+                        }],
+                        'totalSum': 4511,
+                        'dateTime': "2023-05-29T20:37:00"
+                    }
+                }
+            }
+        }
+        r = parse_receipt(s)
+
+        self.assertEqual(r.purchase_date,
+                         datetime.datetime(2023, 5, 29, 20, 37))
