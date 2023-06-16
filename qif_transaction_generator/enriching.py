@@ -100,6 +100,8 @@ def _get_phrases(value):
     split = v.split(' ')
     if len(split) > 3:
         result.append(' '.join(split[:3]))
+    if len(split) > 2:
+        result.append(' '.join(split[:2]))
     if len(split) > 1:
-        result.extend(split[:3])
+        result.append(split[0])
     return result

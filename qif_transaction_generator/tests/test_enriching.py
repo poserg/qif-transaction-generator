@@ -284,30 +284,29 @@ class TestGePhrases(unittest.TestCase):
         self.assertEqual(result, ['test'])
 
         result = _get_phrases('TeSt 2')
-        self.assertEqual(result, ['test 2', 'test', '2'])
+        self.assertEqual(result, ['test 2', 'test'])
 
         result = _get_phrases('The third tesT')
-        self.assertEqual(result, ['the third test', 'the', 'third', 'test'])
+        self.assertEqual(result, ['the third test', 'the third', 'the'])
 
         result = _get_phrases('Very long long string')
         self.assertEqual(result, ['very long long string',
-                                  'very long long', 'very',
-                                  'long', 'long'])
+                                  'very long long',
+                                  'very long',
+                                  'very'])
 
         result = _get_phrases('сыр раненбургъ качокавалло 45% 300г')
         self.assertEqual(result, ['сыр раненбургъ качокавалло 45% 300г',
                                   'сыр раненбургъ качокавалло',
-                                  'сыр',
-                                  'раненбургъ',
-                                  'качокавалло'])
+                                  'сыр раненбургъ',
+                                  'сыр'])
 
     def test_get_phrase_with_numbers_first(self):
         result = _get_phrases('210 МАНДАРИН САТСУМА')
-        self.assertEqual(result, ['мандарин сатсума', 'мандарин', 'сатсума'])
+        self.assertEqual(result, ['мандарин сатсума', 'мандарин'])
 
         result = _get_phrases('4630042269446 ДЖЕМ SPAR АБРИКОСОВЫ')
         self.assertEqual(result, [
             'джем spar абрикосовы',
-            'джем',
-            'spar',
-            'абрикосовы'])
+            'джем spar',
+            'джем'])
