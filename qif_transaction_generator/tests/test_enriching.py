@@ -300,3 +300,14 @@ class TestGePhrases(unittest.TestCase):
                                   'сыр',
                                   'раненбургъ',
                                   'качокавалло'])
+
+    def test_get_phrase_with_numbers_first(self):
+        result = _get_phrases('210 МАНДАРИН САТСУМА')
+        self.assertEqual(result, ['мандарин сатсума', 'мандарин', 'сатсума'])
+
+        result = _get_phrases('4630042269446 ДЖЕМ SPAR АБРИКОСОВЫ')
+        self.assertEqual(result, [
+            'джем spar абрикосовы',
+            'джем',
+            'spar',
+            'абрикосовы'])
