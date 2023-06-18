@@ -1,5 +1,4 @@
 import logging
-import re
 
 from . json_utils import from_string_to_json, parse_receipt
 from . models import StatusEnum
@@ -92,8 +91,6 @@ def _bind_items_to_categories(db_util, receipt):
 
 def _get_phrases(value):
     v = value.lower()
-    v = re.sub('^\\d+', '', v)
-    v = v.strip()
     result = []
     result.append(v)
 
