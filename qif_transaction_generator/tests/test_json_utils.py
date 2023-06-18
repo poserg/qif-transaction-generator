@@ -184,3 +184,24 @@ class TestJsonUtilsParseReceipt(unittest.TestCase):
 
         self.assertEqual(r.purchase_date,
                          datetime.datetime(2023, 5, 29, 20, 37))
+
+    def test_skip_numbers_at_item_name(self):
+        s = {
+            'document': {
+                'receipt': {
+                    'ecashTotalSum': 1211,
+                    'cashTotalSum': 3300,
+                    'items': [{
+                        'name': '4630042269446 ДЖЕМ SPAR АБРИКОСОВЫ',
+                        'price': 20,
+                        'quantity': 31,
+                        'sum': 620
+                    }],
+                    'totalSum': 4511,
+                    'dateTime': 1557385440
+                }
+            }
+        }
+        r = parse_receipt(s)
+
+        self.assertEqual(r.items[0].name, 'ДЖЕМ SPAR АБРИКОСОВЫ')

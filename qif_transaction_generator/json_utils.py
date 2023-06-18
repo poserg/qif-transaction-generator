@@ -1,6 +1,7 @@
 import json as j
 import datetime
 import logging
+import re
 
 from . models import Item, Receipt
 
@@ -33,7 +34,7 @@ def parse_receipt(json):
     for i in r['items']:
         logger.debug('process item %s', i)
         item = Item()
-        item.name = i['name']
+        item.name = re.sub('^\\d+', '', i['name']).strip()
         item.price = i['price']
         item.quantity = i['quantity']
         item.sum = i['sum']
